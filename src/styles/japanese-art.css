@@ -1,0 +1,348 @@
+/* ==========================================================================
+   ⛩️ Phraser Neo-Tokyo 3D Scroll Portfolio — Japanese Art & Aesthetic Layer
+   Author: @stylist
+   Conforms strictly to plan.md and coming-soon-genesis-rubik.html
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Background Drifting Ukiyo-e Clouds
+   -------------------------------------------------------------------------- */
+.bg-art {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.svg-cloud {
+  position: absolute;
+  fill: none;
+  stroke: rgba(117, 200, 232, 0.32);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 12px rgba(22, 78, 120, 0.35))
+          drop-shadow(0 0 30px rgba(5, 8, 13, 0.75));
+  animation: cloudDrift linear infinite;
+  will-change: transform;
+}
+
+@keyframes cloudDrift {
+  0% {
+    transform: translateX(-380px) translateY(0);
+  }
+  50% {
+    transform: translateX(calc(50vw)) translateY(-15px);
+  }
+  100% {
+    transform: translateX(calc(100vw + 380px)) translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Falling Sakura Cherry Blossom Petals
+   -------------------------------------------------------------------------- */
+.sakura-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  background: radial-gradient(circle at 30% 30%, #b8c8d4 0%, #477b9a 42%, rgba(22, 78, 120, 0.18) 100%);
+  border-radius: 150% 0 150% 0;
+  opacity: 0.24;
+  filter: saturate(0.55);
+  animation: fallPetal linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes fallPetal {
+  0% {
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.45;
+  }
+  80% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateY(110vh) translateX(140px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Grimes-Genesis Japanese Gothic Vector Collage
+   -------------------------------------------------------------------------- */
+.grimes-collage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.42;
+  overflow: hidden;
+}
+
+.grimes-collage .etch {
+  fill: none;
+  stroke: #75c8e8;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.38;
+}
+
+.grimes-collage .bone {
+  fill: #a9bac8;
+  fill-opacity: 0.10;
+  stroke: #b8c8d4;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.grimes-collage .ink {
+  fill: #05080d;
+  stroke: #477b9a;
+  stroke-width: 1.5;
+}
+
+.grimes-collage .thin {
+  fill: none;
+  stroke: #477b9a;
+  stroke-width: 1;
+}
+
+.grimes-collage .stamp {
+  fill: none;
+  stroke: #75c8e8;
+  stroke-width: 2;
+}
+
+@media (max-width: 650px) {
+  .grimes-collage {
+    opacity: 0.25;
+  }
+  .grimes-collage .side-left {
+    transform: translate(-75px, 40px) scale(0.8);
+    transform-origin: left center;
+  }
+  .grimes-collage .side-right {
+    transform: translate(70px, 30px) scale(0.8);
+    transform-origin: right center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Vertical Kanji Calligraphic Accent Strips
+   -------------------------------------------------------------------------- */
+.jp-vertical-accent {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: rgba(184, 200, 212, 0.28);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1.5;
+}
+
+.jp-vertical-accent.left {
+  left: 28px;
+  right: auto;
+}
+
+@media (max-width: 580px) {
+  .jp-vertical-accent {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Hanko Wax Seal Stamp ('海' / '⇱')
+   -------------------------------------------------------------------------- */
+.hanko-seal {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 2px solid rgba(117, 200, 232, 0.38);
+  border-radius: 4px;
+  color: var(--blue);
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 900;
+  background: rgba(5, 8, 13, 0.92);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(22, 78, 120, 0.16);
+  transform: rotate(-4deg);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  user-select: none;
+}
+
+.hanko-seal:hover {
+  transform: rotate(0deg) scale(1.1);
+  border-color: var(--cyan);
+  box-shadow: 0 6px 22px rgba(117, 200, 232, 0.35), inset 0 0 16px rgba(22, 78, 120, 0.4);
+}
+
+.hanko-seal.hanko-large {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  border-width: 2.5px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Japanese Badge Pills & Typography
+   -------------------------------------------------------------------------- */
+.jp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  border-radius: 30px;
+  background: rgba(7, 18, 30, 0.88);
+  border: 1px solid rgba(117, 200, 232, 0.28);
+  color: var(--cyan);
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 4px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 25px rgba(10, 32, 56, 0.38);
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.jp-title {
+  font-family: var(--font-family);
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 42px);
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #e2e7eb 10%, #b8c8d4 48%, #477b9a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 5px;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   7. Shimmering Hero Emblem ('⇱') with Moving Gradient Shine
+   -------------------------------------------------------------------------- */
+.logo-wrapper {
+  position: relative;
+  margin: 0 auto 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateZ(50px);
+}
+
+.logo-symbol {
+  font-size: clamp(100px, 18vw, 150px);
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(135deg, #b8c8d4 0%, #477b9a 27%, #164e78 58%, #05080d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 15px 30px rgba(10, 32, 56, 0.85)) drop-shadow(0 0 16px rgba(22, 78, 120, 0.22));
+  animation: logoFloat 5s ease-in-out infinite alternate;
+}
+
+.logo-symbol::after {
+  content: "⇱";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.95) 50%,
+    transparent 65%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: moveShine 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@keyframes logoFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+
+@keyframes moveShine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. Coming Soon & Dot Indicator
+   -------------------------------------------------------------------------- */
+.coming-soon-wrapper {
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-weight: 600;
+  color: #b8c8d4;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.dots-text {
+  display: inline-block;
+  min-width: 32px;
+  text-align: left;
+}
+
+/* --------------------------------------------------------------------------
+   9. Reduced Motion Preference Overrides
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .svg-cloud,
+  .petal,
+  .logo-symbol,
+  .logo-symbol::after {
+    animation: none !important;
+  }
+}

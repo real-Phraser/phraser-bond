@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海向こう Umimukō — Phraser Neo-Tokyo 3D Scroll Portfolio</title>
+  
+  <!-- Theming & Dark Mode Metadata -->
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#05080d">
+  <meta name="description" content="Phraser Neo-Tokyo 3D Scroll Portfolio — Avant-garde spatial archive bridging ancient Japanese minimalism with futuristic cyberpunk liquid glass.">
+  
+  <!-- OpenGraph Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://phraser.bond">
+  <meta property="og:title" content="海向こう Umimukō — Phraser Neo-Tokyo 3D Scroll Portfolio">
+  <meta property="og:description" content="Spatial camera-flight portfolio of Phraser (@real-Phraser), creator of Umimukō Music.">
+  <meta property="og:site_name" content="Umimukō Music">
+  
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="海向こう Umimukō — Phraser Neo-Tokyo 3D Scroll Portfolio">
+  <meta name="twitter:description" content="Spatial camera-flight portfolio of Phraser (@real-Phraser), creator of Umimukō Music.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  
+  <!-- Google Fonts: Rubik 300..900 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 3D Camera Flight Mount Point (scroll-world engine) -->
+  <div id="world" class="world-canvas" aria-hidden="true"></div>
+
+  <!-- Ambient Visual Layers -->
+  <div class="bg-art" id="cloudContainer" aria-hidden="true"></div>
+  <div class="sakura-container" id="sakuraContainer" aria-hidden="true"></div>
+  <div class="grimes-collage" id="grimesCollage" aria-hidden="true"></div>
+
+  <!-- Persistent Header Dock with Japanese Kanji Accents and Spotify Shrine Pill -->
+  <header class="header-dock" id="headerDock">
+    <div class="dock-left">
+      <div class="dock-kanji">海向こう</div>
+      <div class="dock-sub">創 造</div>
+    </div>
+    <div class="dock-right">
+      <a href="https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8" 
+         target="_blank" 
+         rel="noopener noreferrer" 
+         class="spotify-pill" 
+         id="spotifyDockPill"
+         aria-label="Phraser Spotify Audio Shrine">
+        <span class="spotify-pill-bars" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span class="spotify-pill-text">雅 音楽 — Phraser Selection</span>
+        <span class="spotify-pill-arrow" aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Liquid Glass UI Overlay Across Flight Stations -->
+  <main class="scroll-container" id="scrollContainer">
+    <!-- Station 1: The Genesis Hero Card -->
+    <section class="station station-1" id="station-genesis" data-station="1">
+      <div class="container glass-card" id="glassCard">
+        <div class="jp-vertical-accent">海 向 こ う 創 造</div>
+
+        <div class="card-header">
+          <div class="jp-badge">まもなく公開 — 雅</div>
+          <h1 class="jp-title">海向こう Umimukō</h1>
+          <div class="brand-sub">Next Evolution Experience</div>
+        </div>
+
+        <div class="logo-wrapper">
+          <div class="logo-symbol" aria-hidden="true">⇱</div>
+        </div>
+
+        <div class="coming-soon-wrapper">
+          <span>coming soon</span><span class="dots-text" id="dots"></span>
+        </div>
+
+        <div class="hanko-seal">海</div>
+      </div>
+    </section>
+
+    <!-- Station 2: Sound Sanctuary (Spotify Walkman Dock) -->
+    <section class="station station-2" id="station-sound" data-station="2">
+      <div class="glass-card sound-sanctuary-card" id="spotifyCardMount">
+        <!-- Rendered by Spotify widget component -->
+      </div>
+    </section>
+
+    <!-- Station 3: Project Forge (Dynamic 3D Repository Gallery) -->
+    <section class="station station-3" id="station-projects" data-station="3">
+      <div class="projects-gallery-container" id="projectsGalleryMount">
+        <!-- Populated dynamically from projects manifest -->
+      </div>
+    </section>
+
+    <!-- Station 4: Flagship Umimukō Music Spotlight -->
+    <section class="station station-4" id="station-flagship" data-station="4">
+      <div class="glass-card flagship-card" id="flagshipCardMount">
+        <div class="jp-badge">旗艦計画 — Flagship</div>
+        <h2 class="section-title">海向こう Umimukō Music</h2>
+        <p class="section-desc">Cross-platform desktop music player built with Kotlin &amp; Compose Multiplatform.</p>
+        <div class="flagship-actions">
+          <a href="./Umimuko-Music/" class="btn-primary">Documentation ↗</a>
+          <a href="https://github.com/real-Phraser/Umimuko-Music" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Station 5: Terminal Finale -->
+    <section class="station station-5" id="station-terminal" data-station="5">
+      <div class="glass-card terminal-card" id="terminalCardMount">
+        <div class="hanko-seal">⇱</div>
+        <h2 class="section-title">創生・終章 Finale</h2>
+        <p class="section-desc">Art, sound, and spatial code crafted by Phraser (@real-Phraser).</p>
+        <div class="social-links">
+          <a href="https://github.com/real-Phraser" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8" target="_blank" rel="noopener noreferrer">Spotify</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Application Entry Point -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

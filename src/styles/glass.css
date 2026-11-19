@@ -1,0 +1,810 @@
+/* ==========================================================================
+   ⛩️ Phraser Neo-Tokyo 3D Scroll Portfolio — Liquid Glass Architecture
+   Author: @stylist
+   Conforms strictly to plan.md and coming-soon-genesis-rubik.html
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Primary Liquid Glass Card (.container)
+   -------------------------------------------------------------------------- */
+.container,
+.liquid-card {
+  position: relative;
+  z-index: 3;
+  width: min(580px, 90vw);
+  padding: clamp(36px, 6vw, 60px);
+  background: linear-gradient(145deg, rgba(8, 14, 23, 0.86), rgba(5, 8, 13, 0.78));
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(117, 200, 232, 0.2);
+  border-radius: var(--radius);
+  box-shadow:
+    0 40px 110px rgba(0, 0, 0, 0.82),
+    inset 0 1px 0 rgba(184, 200, 212, 0.11),
+    inset 0 -1px 0 rgba(22, 78, 120, 0.22),
+    0 0 50px rgba(10, 32, 56, 0.16);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+  will-change: transform;
+}
+
+/* Dynamic Radial Cursor Spotlight */
+.container::after,
+.liquid-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(22, 78, 120, 0.25),
+    transparent 50%
+  );
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   2. Modular Liquid Glass Cards (.glass-panel, .glass-card)
+   -------------------------------------------------------------------------- */
+.glass-panel {
+  position: relative;
+  background: linear-gradient(145deg, rgba(8, 14, 23, 0.85), rgba(5, 8, 13, 0.75));
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(184, 200, 212, 0.08),
+    inset 0 -1px 0 rgba(22, 78, 120, 0.2);
+  padding: 32px;
+  color: var(--text);
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(117, 200, 232, 0.45);
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.8),
+    0 0 35px rgba(22, 78, 120, 0.3),
+    inset 0 1px 0 rgba(184, 200, 212, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   3. Station Waypoint Spatial Containers
+   -------------------------------------------------------------------------- */
+.station-overlay {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.station-hero-card {
+  width: min(640px, 94vw);
+}
+
+.station-wide-card {
+  width: min(980px, 94vw);
+}
+
+/* Project Forge Grid */
+.forge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 24px;
+  width: 100%;
+  margin-top: 36px;
+}
+
+.project-glass-card {
+  background: linear-gradient(150deg, rgba(8, 14, 23, 0.9), rgba(10, 32, 56, 0.45));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-glass-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--cyan);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(117, 200, 232, 0.2);
+}
+
+.project-glass-card .project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.project-glass-card .project-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.project-glass-card .project-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.project-glass-card .project-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.project-glass-card .project-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(22, 78, 120, 0.3);
+  border: 1px solid rgba(117, 200, 232, 0.2);
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   4. Glass Buttons & Action Controls
+   -------------------------------------------------------------------------- */
+.glass-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(22, 78, 120, 0.5), rgba(8, 14, 23, 0.8));
+  border: 1px solid rgba(117, 200, 232, 0.35);
+  color: var(--text);
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.glass-btn:hover {
+  background: linear-gradient(135deg, rgba(22, 78, 120, 0.8), rgba(117, 200, 232, 0.3));
+  border-color: var(--cyan);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(22, 78, 120, 0.5), 0 0 20px rgba(117, 200, 232, 0.4);
+}
+
+.glass-btn:active {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   5. Sticky Header Dock with Glass Blur
+   -------------------------------------------------------------------------- */
+.header-dock {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1180px, 92vw);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  background: rgba(8, 14, 23, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(117, 200, 232, 0.15);
+  border-radius: 40px;
+  z-index: 100;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.header-brand .emblem-mini {
+  color: var(--cyan);
+  font-size: 18px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-link {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--cyan);
+}
+
+/* --------------------------------------------------------------------------
+   6. Mobile & Viewport Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .container,
+  .liquid-card {
+    padding: 32px 20px;
+    width: 92vw;
+  }
+  .header-dock {
+    top: 10px;
+    padding: 8px 16px;
+  }
+  .header-nav {
+    display: none;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   7. Umimukō Cyber-Cassette Player (Spotify Station 2 Component)
+   -------------------------------------------------------------------------- */
+.spotify-card {
+  width: min(520px, 92vw);
+  background: linear-gradient(145deg, rgba(8, 14, 23, 0.92), rgba(10, 32, 56, 0.85));
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(24px, 4vw, 36px);
+  box-shadow:
+    0 35px 90px rgba(0, 0, 0, 0.85),
+    0 0 45px rgba(22, 78, 120, 0.25),
+    inset 0 1px 0 rgba(184, 200, 212, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text);
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.spotify-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(117, 200, 232, 0.6);
+  box-shadow:
+    0 45px 110px rgba(0, 0, 0, 0.9),
+    0 0 60px rgba(117, 200, 232, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Cyber-Cassette Tape Deck Header */
+.cassette-deck-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(32, 54, 74, 0.7);
+  padding-bottom: 14px;
+}
+
+.cassette-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.cassette-badge .tape-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  animation: pulseLed 1.8s ease-in-out infinite;
+}
+
+@keyframes pulseLed {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.cassette-kanji-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+/* Cassette Tape Spool Window */
+.cassette-window {
+  background: rgba(5, 8, 13, 0.85);
+  border: 1px solid rgba(117, 200, 232, 0.2);
+  border-radius: 14px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.tape-spool {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px dashed rgba(117, 200, 232, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spinSpool 6s linear infinite;
+  box-shadow: 0 0 12px rgba(22, 78, 120, 0.4);
+}
+
+.spool-inner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 2px solid var(--cyan);
+}
+
+@keyframes spinSpool {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.tape-bridge {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(117, 200, 232, 0.4), transparent);
+  margin: 0 20px;
+}
+
+/* Animated Glowing Equalizer */
+.equalizer-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  padding: 4px 0;
+}
+
+.eq-bar {
+  width: 5px;
+  background: linear-gradient(to top, var(--blue), var(--cyan));
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(117, 200, 232, 0.6);
+  animation: eqPulse 1.2s ease-in-out infinite alternate;
+  will-change: height;
+}
+
+.eq-bar:nth-child(1) { height: 35%; animation-delay: 0.1s; }
+.eq-bar:nth-child(2) { height: 75%; animation-delay: 0.35s; }
+.eq-bar:nth-child(3) { height: 50%; animation-delay: 0.15s; }
+.eq-bar:nth-child(4) { height: 95%; animation-delay: 0.5s; }
+.eq-bar:nth-child(5) { height: 60%; animation-delay: 0.25s; }
+.eq-bar:nth-child(6) { height: 85%; animation-delay: 0.4s; }
+.eq-bar:nth-child(7) { height: 40%; animation-delay: 0.2s; }
+
+@keyframes eqPulse {
+  0% {
+    height: 15%;
+    filter: brightness(0.8);
+  }
+  100% {
+    height: 100%;
+    filter: brightness(1.3);
+    box-shadow: 0 0 14px var(--cyan);
+  }
+}
+
+/* Track Metadata & Action */
+.cassette-metadata {
+  text-align: center;
+}
+
+.cassette-track-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 6px;
+  letter-spacing: -0.2px;
+}
+
+.cassette-track-sub {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.spotify-launch-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  background: rgba(30, 215, 96, 0.12);
+  border: 1px solid rgba(30, 215, 96, 0.35);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(30, 215, 96, 0.15);
+}
+
+.spotify-card:hover .spotify-launch-bar {
+  background: rgba(30, 215, 96, 0.25);
+  border-color: #1ed760;
+  box-shadow: 0 6px 25px rgba(30, 215, 96, 0.35);
+  transform: translateY(-2px);
+}
+
+.spotify-icon-svg {
+  width: 20px;
+  height: 20px;
+  fill: #1ed760;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Top-Right Persistent Audio Shrine Pill
+   -------------------------------------------------------------------------- */
+.audio-shrine-pill {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  z-index: 101;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  background: rgba(8, 14, 23, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(117, 200, 232, 0.3);
+  color: var(--cyan);
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-decoration: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(22, 78, 120, 0.3);
+  transition: all 0.25s cubic-bezier(0.2, 0, 0.2, 1);
+  user-select: none;
+}
+
+.audio-shrine-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(117, 200, 232, 0.5);
+}
+
+.audio-shrine-pill .mini-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.audio-shrine-pill .mini-bar {
+  width: 3px;
+  background: var(--cyan);
+  border-radius: 2px;
+  animation: eqPulse 1s ease-in-out infinite alternate;
+}
+
+.audio-shrine-pill .mini-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.audio-shrine-pill .mini-bar:nth-child(2) { height: 100%; animation-delay: 0.3s; }
+.audio-shrine-pill .mini-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+
+.audio-shrine-pill .shrine-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 580px) {
+  .audio-shrine-pill {
+    top: 14px;
+    right: 14px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   9. Station Layout & Architecture Integration
+   -------------------------------------------------------------------------- */
+.scroll-container {
+  width: 100%;
+  position: relative;
+  z-index: 3;
+}
+
+.station {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px 80px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.section-title {
+  font-family: var(--font-family);
+  font-size: clamp(26px, 4.5vw, 38px);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #e2e7eb 10%, #b8c8d4 48%, #477b9a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.section-desc {
+  font-size: clamp(14px, 2vw, 16px);
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto 28px;
+}
+
+/* Sound Sanctuary Card Mount */
+.sound-sanctuary-card {
+  width: min(560px, 92vw);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Flagship Umimukō Card */
+.flagship-card,
+.terminal-card {
+  width: min(600px, 92vw);
+  text-align: center;
+}
+
+.flagship-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--blue), var(--panel2));
+  border: 1px solid var(--cyan);
+  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(117, 200, 232, 0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1d6499, #123860);
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 8px 30px rgba(117, 200, 232, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 30px;
+  background: rgba(8, 14, 23, 0.85);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--cyan);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(22, 78, 120, 0.4);
+}
+
+.social-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  background: rgba(7, 18, 30, 0.85);
+  border: 1px solid rgba(117, 200, 232, 0.25);
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.social-links a:hover {
+  background: var(--blue);
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 16px var(--cyan);
+  transform: translateY(-2px);
+}
+
+/* Header Dock Specifics */
+.dock-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.dock-kanji {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--text);
+  text-shadow: 0 0 12px rgba(117, 200, 232, 0.35);
+}
+
+.dock-sub {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.dock-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Header Dock Spotify Pill */
+.spotify-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  background: rgba(7, 18, 30, 0.9);
+  border: 1px solid rgba(117, 200, 232, 0.3);
+  color: var(--cyan);
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.spotify-pill:hover {
+  background: rgba(22, 78, 120, 0.6);
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 6px 24px rgba(117, 200, 232, 0.4);
+  transform: translateY(-2px);
+}
+
+.spotify-pill-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.spotify-pill-bars span {
+  width: 3px;
+  background: var(--cyan);
+  border-radius: 2px;
+  animation: eqPulse 1.1s ease-in-out infinite alternate;
+}
+
+.spotify-pill-bars span:nth-child(1) { height: 35%; animation-delay: 0.1s; }
+.spotify-pill-bars span:nth-child(2) { height: 95%; animation-delay: 0.3s; }
+.spotify-pill-bars span:nth-child(3) { height: 60%; animation-delay: 0.15s; }
+.spotify-pill-bars span:nth-child(4) { height: 80%; animation-delay: 0.4s; }
+
+.spotify-pill-text {
+  white-space: nowrap;
+}
+
+.spotify-pill-arrow {
+  font-size: 14px;
+  color: var(--cyan);
+}
+
+/* Projects Gallery Container */
+.projects-gallery-container {
+  width: min(1040px, 94vw);
+  margin: 0 auto;
+}

@@ -18,12 +18,11 @@
 .svg-cloud {
   position: absolute;
   fill: none;
-  stroke: rgba(117, 200, 232, 0.32);
-  stroke-width: 2.2;
+  stroke: rgba(117, 200, 232, 0.35);
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 12px rgba(22, 78, 120, 0.35))
-          drop-shadow(0 0 30px rgba(5, 8, 13, 0.75));
+  filter: drop-shadow(0 0 6px rgba(117, 200, 232, 0.22));
   animation: cloudDrift linear infinite;
   will-change: transform;
 }

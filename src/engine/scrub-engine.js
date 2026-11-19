@@ -137,10 +137,10 @@ export class CyberShrineBackdrop {
     this.gateSpacing = this.isMobile ? 420 : 360;
     this.totalGateSpan = this.numGates * this.gateSpacing;
 
-    // Floating Japanese kanji & data particles (reduced on mobile)
+    // Floating Japanese kanji & data particles (optimized counts)
     this.kanjiGlyphs = ['海', '向', '創', '生', '工', '房', '音', '韻', '終', '章', '⇱', '雅', '波', '光'];
     this.particles = [];
-    this.initParticles(this.isMobile ? 10 : 45);
+    this.initParticles(this.isMobile ? 8 : 24);
 
     this.resize = this.resize.bind(this);
     this.render = this.render.bind(this);
@@ -159,6 +159,7 @@ export class CyberShrineBackdrop {
     const cy = window.innerHeight / 2;
     this.targetMouseX = (e.clientX - cx) / cx;
     this.targetMouseY = (e.clientY - cy) / cy;
+    this.idleFrames = 0; // Wake up immediately on mouse interaction
   }
 
   initParticles(count) {
@@ -169,7 +170,7 @@ export class CyberShrineBackdrop {
         y: (Math.random() - 0.5) * 800 - 30,
         z: Math.random() * this.totalGateSpan,
         glyph: this.kanjiGlyphs[i % this.kanjiGlyphs.length],
-        size: 15 + Math.random() * 20,
+        size: 16 + Math.random() * 16,
         alpha: 0.25 + Math.random() * 0.65,
         isRing: Math.random() > 0.65,
         isBeam: Math.random() > 0.85,
@@ -192,6 +193,7 @@ export class CyberShrineBackdrop {
 
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(this.dpr, this.dpr);
+    this.idleFrames = 0;
   }
 
   updateProgress(progress) {
@@ -205,15 +207,19 @@ export class CyberShrineBackdrop {
     const w = this.width;
     const h = this.height;
 
-    // Mobile Power Saver: pause heavy redrawing when stationary
-    if (this.isMobile) {
-      const isMoving = Math.abs(this.targetZ - this.camZ) > 0.1 || this.scrollVelocity > 0.04;
-      if (!isMoving) {
-        this.idleFrames = (this.idleFrames || 0) + 1;
-        if (this.idleFrames > 3) return; // Rest when idle on phone
-      } else {
-        this.idleFrames = 0;
+    // Smart Adaptive Power Saver (Both PC and Mobile):
+    // Renders full 60fps during scroll or camera motion, then rests when idle to save GPU & CPU
+    const isMovingZ = Math.abs(this.targetZ - this.camZ) > 0.05;
+    const isMovingMouse = Math.abs(this.targetMouseX - this.mouseX) > 0.005 || Math.abs(this.targetMouseY - this.mouseY) > 0.005;
+    const hasVelocity = this.scrollVelocity > 0.02;
+
+    if (!isMovingZ && !isMovingMouse && !hasVelocity) {
+      this.idleFrames = (this.idleFrames || 0) + 1;
+      if (this.idleFrames > (this.isMobile ? 2 : 8)) {
+        return; // Fully sleep when stationary
       }
+    } else {
+      this.idleFrames = 0;
     }
 
     ctx.clearRect(0, 0, w, h);
@@ -426,6 +432,9 @@ export class CyberShrineBackdrop {
 
   drawParticles(ctx, vpX, vpY, focalLength, warpFactor) {
     ctx.save();
+    ctx.font = "24px 'Rubik', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
     for (const p of this.particles) {
       p.rot += p.rotSpeed;
@@ -465,17 +474,16 @@ export class CyberShrineBackdrop {
         ctx.fillStyle = `rgba(117, 200, 232, ${(alpha * 0.8).toFixed(3)})`;
         ctx.fillRect(sx - 1, sy - 15 * scale, 2, 30 * scale);
       } else {
-        // Floating Japanese Kanji Glyphs
+        // Floating Japanese Kanji Glyphs (Hardware-accelerated scale transform)
         ctx.save();
         ctx.translate(sx, sy);
         ctx.rotate(p.rot);
+        const fontScale = scale * (p.size / 24);
+        ctx.scale(fontScale, fontScale);
         ctx.fillStyle = `rgba(220, 229, 236, ${alpha.toFixed(3)})`;
-        ctx.font = `${Math.floor(p.size * scale)}px 'Rubik', sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
         if (!this.isMobile) {
-          ctx.shadowColor = 'rgba(117, 200, 232, 0.6)';
-          ctx.shadowBlur = 8 * scale;
+          ctx.shadowColor = 'rgba(117, 200, 232, 0.55)';
+          ctx.shadowBlur = 6;
         }
         ctx.fillText(p.glyph, 0, 0);
         ctx.restore();

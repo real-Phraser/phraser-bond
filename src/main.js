@@ -104,9 +104,9 @@ function setupHeaderNav() {
 
 /**
  * 3D Tilt and Dynamic Cursor Spotlight for Liquid Glass Containers
+ * High-performance rAF debouncing (zero layout reflows during mousemove)
  */
 function setupTiltEffect() {
-  // Mobile Performance: completely bypass on touch / coarse pointer devices to keep phones light
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     return;
   }
@@ -114,32 +114,45 @@ function setupTiltEffect() {
   const cards = document.querySelectorAll('.glass-card, .container, .liquid-card');
   if (!cards.length) return;
 
+  let ticking = false;
+  let clientX = 0;
+  let clientY = 0;
+
   window.addEventListener('mousemove', (e) => {
-    cards.forEach((card) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    clientX = e.clientX;
+    clientY = e.clientY;
 
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => {
+        const vh = window.innerHeight;
+        cards.forEach((card) => {
+          const rect = card.getBoundingClientRect();
+          if (rect.top < vh && rect.bottom > 0) {
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
 
-      // Only tilt if element is visible in the viewport
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = -((y - centerY) / centerY) * 5;
-        const rotateY = ((x - centerX) / centerX) * 5;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
 
-        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
-      }
-    });
-  });
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = -((y - centerY) / centerY) * 4;
+            const rotateY = ((x - centerX) / centerX) * 4;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+          }
+        });
+        ticking = false;
+      });
+    }
+  }, { passive: true });
 
   window.addEventListener('mouseleave', () => {
     cards.forEach((card) => {
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
     });
-  });
+  }, { passive: true });
 }
 
 // Start application when DOM is ready

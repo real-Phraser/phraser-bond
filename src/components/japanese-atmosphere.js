@@ -28,15 +28,18 @@ export function initUkiyoEClouds(container = '#cloudContainer') {
   const el = typeof container === 'string' ? document.querySelector(container) : container;
   if (!el) return;
 
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+  const cloudCount = isMobile ? 3 : 6;
+
   el.innerHTML = '';
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < cloudCount; i++) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'svg-cloud');
     svg.setAttribute('viewBox', '0 0 511.33 620.78');
     svg.setAttribute('aria-hidden', 'true');
 
-    const topPos = i * 8 + Math.random() * 5;
-    const duration = Math.random() * 16 + 22; // 22s - 38s
+    const topPos = i * (isMobile ? 24 : 14) + Math.random() * 6;
+    const duration = Math.random() * 16 + 24; // 24s - 40s smooth drift
     const delay = -Math.random() * duration;
     const scale = Math.random() * 0.35 + 0.5;
 
@@ -44,7 +47,7 @@ export function initUkiyoEClouds(container = '#cloudContainer') {
     svg.style.width = `${320 * scale}px`;
     svg.style.animationDuration = `${duration}s`;
     svg.style.animationDelay = `${delay}s`;
-    svg.style.opacity = `${Math.random() * 0.25 + 0.4}`;
+    svg.style.opacity = `${Math.random() * 0.25 + 0.35}`;
 
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', CLOUD_PATHS[i % CLOUD_PATHS.length]);
@@ -58,22 +61,25 @@ export function initUkiyoEClouds(container = '#cloudContainer') {
 }
 
 /**
- * Spawns 22 falling sakura cherry blossom petals
+ * Spawns falling sakura cherry blossom petals (lightweight & graceful)
  * @param {HTMLElement|string} container
  */
 export function initSakuraPetals(container = '#sakuraContainer') {
   const el = typeof container === 'string' ? document.querySelector(container) : container;
   if (!el) return;
 
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+  const petalCount = isMobile ? 5 : 12;
+
   el.innerHTML = '';
-  for (let i = 0; i < 22; i++) {
+  for (let i = 0; i < petalCount; i++) {
     const petal = document.createElement('div');
     petal.className = 'petal';
-    const size = Math.floor(Math.random() * 8) + 8;
+    const size = Math.floor(Math.random() * 6) + 8;
     petal.style.width = `${size}px`;
-    petal.style.height = `${size * 1.4}px`;
+    petal.style.height = `${size * 1.35}px`;
     petal.style.left = `${Math.random() * 100}vw`;
-    petal.style.animationDuration = `${Math.random() * 10 + 10}s`;
+    petal.style.animationDuration = `${Math.random() * 10 + 12}s`;
     petal.style.animationDelay = `${Math.random() * 10}s`;
     el.appendChild(petal);
   }

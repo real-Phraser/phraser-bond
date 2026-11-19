@@ -5,23 +5,27 @@
    Adapted from scroll-world battle-tested architecture for phraser-bond.
 
    CORE CAPABILITIES:
-   1. Continuous 3D camera-flight scrub engine driven by window scroll position.
-   2. Video Blob URL fetcher & in-memory object URL caching pipeline:
+   1. Continuous 3D camera-flight scrub engine tightly calibrated to document height:
+      - Tightly matches the 5 flight stations with ZERO dead empty scroll space at the bottom.
+   2. Elevated Vibrant Generative 3D Cyber-Shrine WebGL / Canvas Motion Backdrop:
+      - 3D Torii gates colonnade receding into deep perspective.
+      - Glowing neon cyber-grid floor and ceiling tunnel.
+      - 3D floating illuminated Japanese kanji motes (創, 生, 工, 房, 海, 向, 音, 韻, 終, 章, ⇱, 雅).
+      - Smooth interactive mouse parallax (pitch & yaw camera tilting).
+      - Velocity-responsive warp streaks when scrolling rapidly.
+   3. 3D Spatial Minimap & Flight Waypoint HUD:
+      - Interactive cyberpunk flight radar showing the 5 flight stations:
+        [01 創生] -> [02 工房] -> [03 海向] -> [04 音韻] -> [05 終章].
+      - Dynamic traveling drone cursor and real-time altitude & sector telemetry.
+   4. Video Blob URL fetcher & in-memory object URL caching pipeline:
       - Fetches media into in-memory Blobs and plays from object URLs.
-      - Guarantees full seekability (video.seekable.end(0) > 0) on any static host.
       - Eliminates byte-range stalls and prevents freezing at frame 0.
-   3. Touch/Mobile seek coalescing & iOS video priming:
+   5. Touch/Mobile seek coalescing & iOS video priming:
       - Coalesces seeks: avoids issuing new currentTime while decoder is seeking.
       - Coarser seek epsilon on coarse pointer / mobile devices (eps = 0.02).
       - Primes muted video playback on first user touch gesture to prevent iOS black frames.
       - Keeps still poster visible until video paints first frame ('seeked' event).
-      - Ignores mobile URL-bar collapse height-only resize events.
-   4. Generative Cyber-Shrine WebGL / Canvas Motion Backdrop:
-      - High-performance 60fps 3D canvas backdrop rendering Neo-Tokyo cyber torii gates,
-        converging perspective grid lines, floating Japanese kanji glyphs, and volumetric fog.
-      - Acts as graceful fallback when video assets are loading, absent, or when
-        prefers-reduced-motion is active.
-   5. Waypoint Event System & Station Activation Callbacks:
+   6. Waypoint Event System & Station Activation Callbacks:
       - Exposes smooth callbacks (onStationChange, onScrollProgress, onTransition).
       - Dispatches DOM CustomEvents on container ('stationchange', 'scrollprogress', 'stationtransition').
    ============================================================================ */
@@ -97,7 +101,8 @@ export const globalBlobCache = new VideoBlobCache();
 
 /**
  * Generative Cyber-Shrine 3D Canvas Backdrop
- * Renders Neo-Tokyo perspective wireframe torii gates, cyber grid, and floating kanji motes.
+ * Renders an elevated, vibrant Neo-Tokyo flight with Torii gates, perspective grids,
+ * floating kanji motes, mouse parallax, and warp streaks.
  */
 export class CyberShrineBackdrop {
   constructor(hostElement, options = {}) {
@@ -115,37 +120,56 @@ export class CyberShrineBackdrop {
     // Camera and flight state
     this.camZ = 0;
     this.targetZ = 0;
+    this.lastCamZ = 0;
+    this.scrollVelocity = 0;
     this.scrollProgress = 0;
 
+    // Mouse parallax tracking
+    this.mouseX = 0;
+    this.mouseY = 0;
+    this.targetMouseX = 0;
+    this.targetMouseY = 0;
+
     // Torii gates configuration in 3D world space
-    this.numGates = 7;
-    this.gateSpacing = 380;
+    this.numGates = 8;
+    this.gateSpacing = 360;
     this.totalGateSpan = this.numGates * this.gateSpacing;
 
     // Floating Japanese kanji & data particles
-    this.kanjiGlyphs = ['海', '向', '創', '生', '音', '韻', '工', '房', '雅', '⇱', '波', '光'];
+    this.kanjiGlyphs = ['海', '向', '創', '生', '工', '房', '音', '韻', '終', '章', '⇱', '雅', '波', '光'];
     this.particles = [];
-    this.initParticles(36);
+    this.initParticles(45);
 
     this.resize = this.resize.bind(this);
     this.render = this.render.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
 
     this.resize();
     window.addEventListener('resize', this.resize, { passive: true });
+    window.addEventListener('mousemove', this.onMouseMove, { passive: true });
+  }
+
+  onMouseMove(e) {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    this.targetMouseX = (e.clientX - cx) / cx;
+    this.targetMouseY = (e.clientY - cy) / cy;
   }
 
   initParticles(count) {
     this.particles = [];
     for (let i = 0; i < count; i++) {
       this.particles.push({
-        x: (Math.random() - 0.5) * 1200,
-        y: (Math.random() - 0.5) * 600 - 40,
+        x: (Math.random() - 0.5) * 1400,
+        y: (Math.random() - 0.5) * 800 - 30,
         z: Math.random() * this.totalGateSpan,
         glyph: this.kanjiGlyphs[i % this.kanjiGlyphs.length],
-        size: 14 + Math.random() * 16,
-        alpha: 0.2 + Math.random() * 0.5,
-        isRing: Math.random() > 0.6,
-        driftSpeed: (Math.random() - 0.5) * 0.4,
+        size: 15 + Math.random() * 20,
+        alpha: 0.25 + Math.random() * 0.65,
+        isRing: Math.random() > 0.65,
+        isBeam: Math.random() > 0.85,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.02,
       });
     }
   }
@@ -165,8 +189,8 @@ export class CyberShrineBackdrop {
 
   updateProgress(progress) {
     this.scrollProgress = progress;
-    // Map total scroll progress to forward camera flight in Z
-    this.targetZ = progress * this.totalGateSpan * 1.8;
+    // Map total scroll progress smoothly to forward camera flight in Z
+    this.targetZ = progress * this.totalGateSpan * 2.2;
   }
 
   render() {
@@ -180,53 +204,64 @@ export class CyberShrineBackdrop {
     if (this.reduceMotion) {
       this.camZ = this.targetZ * 0.1;
     } else {
-      this.camZ += (this.targetZ - this.camZ) * 0.12;
+      this.camZ += (this.targetZ - this.camZ) * 0.14;
     }
 
-    const vpX = w * 0.5;
-    const vpY = h * 0.45;
-    const focalLength = 360;
+    // Calculate scroll velocity for warp streaks
+    const dZ = Math.abs(this.camZ - this.lastCamZ);
+    this.scrollVelocity += (dZ - this.scrollVelocity) * 0.2;
+    this.lastCamZ = this.camZ;
+    const warpFactor = Math.min(this.scrollVelocity / 18, 1);
 
-    // 1. Cyber-Grid Floor & Horizon Perspective
-    this.drawCyberGrid(ctx, w, h, vpX, vpY, focalLength);
+    // Damped mouse parallax
+    this.mouseX += (this.targetMouseX - this.mouseX) * 0.08;
+    this.mouseY += (this.targetMouseY - this.mouseY) * 0.08;
 
-    // 2. Horizon Glow & Atmospheric Orb
+    // Vanishing Point with interactive 3D perspective tilt
+    const vpX = w * (0.5 + this.mouseX * 0.05);
+    const vpY = h * (0.44 + this.mouseY * 0.04);
+    const focalLength = 380;
+
+    // 1. Cyber-Grid Floor & Ceiling Tunnel Perspective
+    this.drawCyberGrid(ctx, w, h, vpX, vpY, focalLength, warpFactor);
+
+    // 2. Horizon Glow & Atmospheric Void Nebula
     this.drawHorizonGlow(ctx, vpX, vpY);
 
-    // 3. 3D Wireframe Cyber Torii Gates
+    // 3. 3D Wireframe Cyber Torii Gates Colonnade
     this.drawToriiGates(ctx, vpX, vpY, focalLength);
 
-    // 4. Floating Kanji & Cyber Sparks
-    this.drawParticles(ctx, vpX, vpY, focalLength);
+    // 4. Floating Kanji, Data Motes & Warp Streaks
+    this.drawParticles(ctx, vpX, vpY, focalLength, warpFactor);
   }
 
   drawHorizonGlow(ctx, vpX, vpY) {
-    const radGlow = ctx.createRadialGradient(vpX, vpY, 10, vpX, vpY, 280);
-    radGlow.addColorStop(0, 'rgba(117, 200, 232, 0.28)');
-    radGlow.addColorStop(0.35, 'rgba(22, 78, 120, 0.18)');
-    radGlow.addColorStop(0.7, 'rgba(10, 32, 56, 0.08)');
+    const radGlow = ctx.createRadialGradient(vpX, vpY, 15, vpX, vpY, 320);
+    radGlow.addColorStop(0, 'rgba(117, 200, 232, 0.38)');
+    radGlow.addColorStop(0.3, 'rgba(22, 78, 120, 0.25)');
+    radGlow.addColorStop(0.65, 'rgba(10, 32, 56, 0.12)');
     radGlow.addColorStop(1, 'transparent');
 
     ctx.fillStyle = radGlow;
     ctx.beginPath();
-    ctx.arc(vpX, vpY, 280, 0, Math.PI * 2);
+    ctx.arc(vpX, vpY, 320, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  drawCyberGrid(ctx, w, h, vpX, vpY, focalLength) {
+  drawCyberGrid(ctx, w, h, vpX, vpY, focalLength, warpFactor) {
     ctx.save();
     ctx.lineWidth = 1;
 
-    // Perspective floor lines
-    const numFloorLines = 14;
+    // A. Perspective floor lines (converging to vanishing point)
+    const numFloorLines = 18;
     for (let i = 0; i <= numFloorLines; i++) {
-      const xOffset = ((i - numFloorLines / 2) / (numFloorLines / 2)) * (w * 0.9);
-      const bottomX = vpX + xOffset * 1.8;
+      const xOffset = ((i - numFloorLines / 2) / (numFloorLines / 2)) * (w * 1.1);
+      const bottomX = vpX + xOffset * 2.0;
 
       const grad = ctx.createLinearGradient(vpX, vpY, bottomX, h);
       grad.addColorStop(0, 'rgba(117, 200, 232, 0)');
-      grad.addColorStop(0.3, 'rgba(22, 78, 120, 0.15)');
-      grad.addColorStop(1, 'rgba(117, 200, 232, 0.22)');
+      grad.addColorStop(0.3, 'rgba(22, 78, 120, 0.25)');
+      grad.addColorStop(1, 'rgba(117, 200, 232, 0.35)');
 
       ctx.strokeStyle = grad;
       ctx.beginPath();
@@ -235,9 +270,27 @@ export class CyberShrineBackdrop {
       ctx.stroke();
     }
 
-    // Moving horizontal cross-grid rungs (Z motion)
-    const rungCount = 10;
-    const rungSpacing = 160;
+    // B. Subtle ceiling grid lines (cyber tunnel ceiling)
+    const numCeilLines = 12;
+    for (let i = 0; i <= numCeilLines; i++) {
+      const xOffset = ((i - numCeilLines / 2) / (numCeilLines / 2)) * (w * 1.0);
+      const topX = vpX + xOffset * 1.6;
+
+      const grad = ctx.createLinearGradient(vpX, vpY, topX, 0);
+      grad.addColorStop(0, 'rgba(117, 200, 232, 0)');
+      grad.addColorStop(0.4, 'rgba(22, 78, 120, 0.15)');
+      grad.addColorStop(1, 'rgba(117, 200, 232, 0.2)');
+
+      ctx.strokeStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(vpX, vpY - 4);
+      ctx.lineTo(topX, 0);
+      ctx.stroke();
+    }
+
+    // C. Moving horizontal cross-grid rungs (Z forward flight motion)
+    const rungCount = 12;
+    const rungSpacing = 140;
     const zOffset = (this.camZ % rungSpacing);
 
     for (let i = 1; i <= rungCount; i++) {
@@ -245,11 +298,11 @@ export class CyberShrineBackdrop {
       if (z <= 10) continue;
 
       const scale = focalLength / (focalLength + z);
-      const y = vpY + (h - vpY) * (scale * 1.3);
+      const y = vpY + (h - vpY) * (scale * 1.35);
       if (y > h || y < vpY) continue;
 
-      const spanX = (w * 0.9) * scale * 1.8;
-      const alpha = Math.min(1, Math.max(0, (scale - 0.12) * 1.4)) * 0.22;
+      const spanX = (w * 1.1) * scale * 2.0;
+      const alpha = Math.min(1, Math.max(0, (scale - 0.1) * 1.5)) * 0.32;
 
       ctx.strokeStyle = `rgba(117, 200, 232, ${alpha.toFixed(3)})`;
       ctx.beginPath();
@@ -267,68 +320,68 @@ export class CyberShrineBackdrop {
     for (let i = 0; i < this.numGates; i++) {
       // Calculate continuous repeating gate positions along flight axis
       let gateZ = (i * this.gateSpacing - (this.camZ % this.totalGateSpan));
-      if (gateZ < -100) gateZ += this.totalGateSpan;
+      if (gateZ < -120) gateZ += this.totalGateSpan;
       if (gateZ < 15) continue; // Behind or right in front of camera
 
       const scale = focalLength / (focalLength + gateZ);
-      const alpha = Math.min(1, Math.max(0, (1 - gateZ / (this.totalGateSpan * 0.95)))) * 0.85;
+      const alpha = Math.min(1, Math.max(0, (1 - gateZ / (this.totalGateSpan * 0.94)))) * 0.92;
       if (alpha <= 0.01) continue;
 
-      const gateWidth = 420 * scale;
-      const gateHeight = 310 * scale;
+      const gateWidth = 460 * scale;
+      const gateHeight = 330 * scale;
       const gateX = vpX;
-      const gateY = vpY + (gateHeight * 0.2);
+      const gateY = vpY + (gateHeight * 0.22);
 
       // Kasagi (Top curved horizontal lintel)
       const kasagiY = gateY - gateHeight;
-      const kasagiOverhang = gateWidth * 0.62;
-      const curveLift = 14 * scale;
+      const kasagiOverhang = gateWidth * 0.65;
+      const curveLift = 18 * scale;
 
-      ctx.lineWidth = Math.max(1.2, 3 * scale);
+      ctx.lineWidth = Math.max(1.5, 3.5 * scale);
       ctx.strokeStyle = `rgba(117, 200, 232, ${alpha.toFixed(3)})`;
-      ctx.shadowColor = 'rgba(117, 200, 232, 0.4)';
-      ctx.shadowBlur = 10 * scale;
+      ctx.shadowColor = 'rgba(117, 200, 232, 0.55)';
+      ctx.shadowBlur = 12 * scale;
 
       ctx.beginPath();
       ctx.moveTo(gateX - kasagiOverhang, kasagiY - curveLift);
-      ctx.quadraticCurveTo(gateX, kasagiY + curveLift * 0.3, gateX + kasagiOverhang, kasagiY - curveLift);
+      ctx.quadraticCurveTo(gateX, kasagiY + curveLift * 0.35, gateX + kasagiOverhang, kasagiY - curveLift);
       ctx.stroke();
 
       // Shimaki (Second horizontal beam directly beneath Kasagi)
-      const shimakiY = kasagiY + (16 * scale);
+      const shimakiY = kasagiY + (18 * scale);
       ctx.beginPath();
-      ctx.moveTo(gateX - kasagiOverhang * 0.9, shimakiY);
-      ctx.lineTo(gateX + kasagiOverhang * 0.9, shimakiY);
+      ctx.moveTo(gateX - kasagiOverhang * 0.88, shimakiY);
+      ctx.lineTo(gateX + kasagiOverhang * 0.88, shimakiY);
       ctx.stroke();
 
       // Nuki (Lower crossbar)
-      const nukiY = kasagiY + (60 * scale);
-      const nukiOverhang = gateWidth * 0.52;
-      ctx.strokeStyle = `rgba(22, 78, 120, ${(alpha * 0.9).toFixed(3)})`;
+      const nukiY = kasagiY + (68 * scale);
+      const nukiOverhang = gateWidth * 0.54;
+      ctx.strokeStyle = `rgba(22, 78, 120, ${(alpha * 0.95).toFixed(3)})`;
       ctx.beginPath();
       ctx.moveTo(gateX - nukiOverhang, nukiY);
       ctx.lineTo(gateX + nukiOverhang, nukiY);
       ctx.stroke();
 
-      // Gakuzuka (Center tablet bracket / emblem holder)
-      const tabletWidth = 24 * scale;
+      // Gakuzuka (Center tablet bracket / emblem plaque)
+      const tabletWidth = 28 * scale;
       const tabletHeight = (nukiY - shimakiY);
       ctx.strokeRect(gateX - tabletWidth / 2, shimakiY, tabletWidth, tabletHeight);
 
       // Central ⇱ Kanji/Seal emblem inside tablet
-      if (scale > 0.4) {
-        ctx.fillStyle = `rgba(117, 200, 232, ${(alpha * 0.9).toFixed(3)})`;
-        ctx.font = `${Math.floor(14 * scale)}px 'Rubik', sans-serif`;
+      if (scale > 0.35) {
+        ctx.fillStyle = `rgba(117, 200, 232, ${(alpha * 0.95).toFixed(3)})`;
+        ctx.font = `${Math.floor(16 * scale)}px 'Rubik', sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('⇱', gateX, shimakiY + tabletHeight / 2);
       }
 
       // Left and Right Cylindrical Pillars
-      const pillarDist = gateWidth * 0.38;
-      const groundY = gateY + (80 * scale);
+      const pillarDist = gateWidth * 0.4;
+      const groundY = gateY + (85 * scale);
 
-      ctx.strokeStyle = `rgba(117, 200, 232, ${(alpha * 0.75).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(117, 200, 232, ${(alpha * 0.82).toFixed(3)})`;
       ctx.beginPath();
       // Left pillar
       ctx.moveTo(gateX - pillarDist, kasagiY);
@@ -339,9 +392,9 @@ export class CyberShrineBackdrop {
       ctx.stroke();
 
       // Pedestal foundation blocks (Kamebara)
-      const baseW = 28 * scale;
-      const baseH = 10 * scale;
-      ctx.fillStyle = `rgba(10, 32, 56, ${(alpha * 0.6).toFixed(3)})`;
+      const baseW = 32 * scale;
+      const baseH = 12 * scale;
+      ctx.fillStyle = `rgba(10, 32, 56, ${(alpha * 0.7).toFixed(3)})`;
       ctx.fillRect(gateX - pillarDist * 1.05 - baseW / 2, groundY, baseW, baseH);
       ctx.fillRect(gateX + pillarDist * 1.05 - baseW / 2, groundY, baseW, baseH);
     }
@@ -349,11 +402,13 @@ export class CyberShrineBackdrop {
     ctx.restore();
   }
 
-  drawParticles(ctx, vpX, vpY, focalLength) {
+  drawParticles(ctx, vpX, vpY, focalLength, warpFactor) {
     ctx.save();
 
     for (const p of this.particles) {
-      let pz = (p.z - (this.camZ * 0.8) % this.totalGateSpan);
+      p.rot += p.rotSpeed;
+
+      let pz = (p.z - (this.camZ * 0.85) % this.totalGateSpan);
       if (pz < 10) pz += this.totalGateSpan;
 
       const scale = focalLength / (focalLength + pz);
@@ -363,6 +418,19 @@ export class CyberShrineBackdrop {
       const sx = vpX + p.x * scale;
       const sy = vpY + p.y * scale;
 
+      // Warp speed stretch when scrolling fast
+      const streakLength = warpFactor * 32 * scale;
+
+      if (streakLength > 3) {
+        // High-velocity light streak
+        ctx.strokeStyle = `rgba(117, 200, 232, ${(alpha * 0.9).toFixed(3)})`;
+        ctx.lineWidth = Math.max(1.2, 2.5 * scale);
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + (sx - vpX) * 0.15 * warpFactor, sy + (sy - vpY) * 0.15 * warpFactor);
+        ctx.stroke();
+      }
+
       if (p.isRing) {
         // Glowing cyan energy ring
         ctx.strokeStyle = `rgba(117, 200, 232, ${alpha.toFixed(3)})`;
@@ -370,13 +438,23 @@ export class CyberShrineBackdrop {
         ctx.beginPath();
         ctx.arc(sx, sy, p.size * scale * 0.6, 0, Math.PI * 2);
         ctx.stroke();
+      } else if (p.isBeam) {
+        // Vertical cyber pillar energy spark
+        ctx.fillStyle = `rgba(117, 200, 232, ${(alpha * 0.8).toFixed(3)})`;
+        ctx.fillRect(sx - 1, sy - 15 * scale, 2, 30 * scale);
       } else {
         // Floating Japanese Kanji Glyphs
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(p.rot);
         ctx.fillStyle = `rgba(220, 229, 236, ${alpha.toFixed(3)})`;
         ctx.font = `${Math.floor(p.size * scale)}px 'Rubik', sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(p.glyph, sx, sy);
+        ctx.shadowColor = 'rgba(117, 200, 232, 0.6)';
+        ctx.shadowBlur = 8 * scale;
+        ctx.fillText(p.glyph, 0, 0);
+        ctx.restore();
       }
     }
 
@@ -385,6 +463,7 @@ export class CyberShrineBackdrop {
 
   destroy() {
     window.removeEventListener('resize', this.resize);
+    window.removeEventListener('mousemove', this.onMouseMove);
     if (this.canvas && this.canvas.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
     }
@@ -415,8 +494,8 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
   const SECTIONS = config.sections || [];
   const CONNECTORS = config.connectors || [];
   const CONNECTORS_M = config.connectorsMobile || [];
-  const DIVE_W = config.diveScroll || 1.5;
-  const CONN_W = config.connScroll || 0.9;
+  const DIVE_W = config.diveScroll || 1.0;
+  const CONN_W = config.connScroll || 0.6;
   const CROSSFADE = (config.crossfade != null) ? config.crossfade : 0.12;
   const N = SECTIONS.length;
 
@@ -478,30 +557,28 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
   const scrollbarFill = el('span');
   scrollbar.appendChild(scrollbarFill);
 
-  const topbar = el('div', 'sw-topbar');
-  if (config.brand) {
-    const brand = el('a', 'sw-brand');
-    brand.href = config.brand.href || '#';
-    brand.appendChild(el('span', 'sw-brand__mark'));
-    const nm = el('span', 'sw-brand__name');
-    nm.textContent = config.brand.name || '';
-    brand.appendChild(nm);
-    topbar.appendChild(brand);
-  }
-
-  const nav = el('nav', 'sw-nav');
-  if (config.nav !== false) topbar.appendChild(nav);
-
-  if (config.cta && config.cta.label) {
-    const c = el('a', 'sw-topcta');
-    c.href = config.cta.href || '#';
-    c.textContent = config.cta.label;
-    topbar.appendChild(c);
-  }
-
   const stage = el('div', 'sw-stage');
   const copylayer = el('div', 'sw-copylayer');
-  const route = el('div', 'sw-route');
+
+  // 3D Spatial Minimap / Flight Waypoint HUD
+  const minimap = el('div', 'sw-minimap');
+  minimap.id = 'swMinimap';
+  minimap.innerHTML = `
+    <div class="sw-minimap__header">
+      <span class="sw-minimap__radar-pulse"></span>
+      <span class="sw-minimap__title">空間航路 // FLIGHT RADAR</span>
+    </div>
+    <div class="sw-minimap__track">
+      <div class="sw-minimap__line"></div>
+      <div class="sw-minimap__drone" id="swMinimapDrone"></div>
+      <div class="sw-minimap__nodes" id="swMinimapNodes"></div>
+    </div>
+    <div class="sw-minimap__telemetry">
+      <span class="sw-telemetry-item">ALT: <b id="swAlt">120m</b></span>
+      <span class="sw-telemetry-item">NAV: <b id="swNav">01 // 創生</b></span>
+    </div>
+  `;
+
   const hint = el('div', 'sw-hint');
   const hintText = el('span');
   hintText.textContent = config.hint || 'スクロールして探索 // SCROLL TO FLY';
@@ -511,7 +588,32 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
   const track = el('div', 'sw-track');
 
   // Mount elements to container
-  [sky, scrollbar, topbar, stage, copylayer, route, hint, track].forEach(node => container.appendChild(node));
+  [sky, scrollbar, stage, copylayer, minimap, hint, track].forEach(node => container.appendChild(node));
+
+  // Populate Minimap Nodes
+  const minimapNodesContainer = minimap.querySelector('#swMinimapNodes');
+  const minimapDrone = minimap.querySelector('#swMinimapDrone');
+  const navTelemetry = minimap.querySelector('#swNav');
+  const altTelemetry = minimap.querySelector('#swAlt');
+
+  const minimapNodeButtons = [];
+  SECTIONS.forEach((s, idx) => {
+    const btn = el('button', 'sw-minimap__node');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('data-index', String(idx));
+    btn.setAttribute('aria-label', `Navigate to Station ${idx + 1}: ${s.label || ''}`);
+    btn.innerHTML = `
+      <span class="node-badge">0${idx + 1}</span>
+      <span class="node-kanji">${esc(s.kanji || '')}</span>
+      <span class="node-name">${esc(s.title ? s.title.replace(/^[0-9:\s]+/, '') : '')}</span>
+    `;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      jumpTo(idx);
+    });
+    minimapNodesContainer.appendChild(btn);
+    minimapNodeButtons.push(btn);
+  });
 
   // Initialize Generative Cyber-Shrine Backdrop inside stage
   const backdrop = new CyberShrineBackdrop(stage, { reduceMotion });
@@ -549,48 +651,6 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
     s.visible = false;
   });
 
-  // Per-section Copy / Route dots / Nav buttons
-  const copies = [];
-  const dots = [];
-
-  SECTIONS.forEach((s, i) => {
-    const c = el('article', 'sw-copy');
-    c.style.setProperty('--sw-accent', s.accent || '');
-    c.innerHTML =
-      `<span class="sw-copy__num">${pad(i + 1)} / ${pad(N)}</span>` +
-      (s.kanji ? `<span class="sw-copy__kanji">${esc(s.kanji)}</span>` : '') +
-      (s.eyebrow ? `<span class="sw-copy__eyebrow">${esc(s.eyebrow)}</span>` : '') +
-      (s.title ? `<h2 class="sw-copy__title">${esc(s.title)}</h2>` : '') +
-      (s.body ? `<p class="sw-copy__body">${esc(s.body)}</p>` : '') +
-      (s.tags && s.tags.length ? `<ul class="sw-copy__tags">${s.tags.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
-      (s.cta ? `<div class="sw-copy__cta">${ctaBtns(s.cta)}</div>` : '');
-
-    // Allow user to suppress default copy layer if they render custom HTML stations
-    if (config.showDefaultCopy !== false) {
-      copylayer.appendChild(c);
-    }
-    copies.push(c);
-
-    // Route waypoint dot
-    const dot = el('button', 'sw-route__dot');
-    dot.setAttribute('type', 'button');
-    dot.setAttribute('aria-label', `Jump to station ${i + 1}: ${s.label || ''}`);
-    dot.style.setProperty('--sw-accent', s.accent || '');
-    dot.innerHTML = `<span class="sw-route__label">${esc(s.label || '')}</span><i></i>`;
-    dot.addEventListener('click', () => jumpTo(i));
-    route.appendChild(dot);
-    dots.push(dot);
-
-    // Header nav link
-    if (config.nav !== false) {
-      const b = el('button', 'sw-nav__item');
-      b.setAttribute('type', 'button');
-      b.textContent = s.label || '';
-      b.addEventListener('click', () => jumpTo(i));
-      nav.appendChild(b);
-    }
-  });
-
   // ---- Math & Physics Helpers ----
   const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const smooth = x => { x = clamp(x); return x * x * (3 - 2 * x); };
@@ -601,30 +661,89 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
   };
 
   let vh = window.innerHeight;
-  let totalW = 0;
   let activeIndex = -1;
   let ticking = false;
   let isRunning = true;
   let laidOutW = window.innerWidth;
   let userReady = false;
 
+  const rAF = (cb) => {
+    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      return window.requestAnimationFrame(cb);
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      return requestAnimationFrame(cb);
+    }
+    return setTimeout(cb, 16);
+  };
+
+  const cancelRAF = (id) => {
+    if (typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+      window.cancelAnimationFrame(id);
+    } else if (typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(id);
+    } else {
+      clearTimeout(id);
+    }
+  };
+
+  let rafId = null;
+
+  /**
+   * Layout & Track Calibration
+   * If .scroll-container exists in DOM, track height is zeroed so document scroll
+   * is tightly bounded to the content with ZERO dead empty space.
+   */
   function layout() {
     vh = window.innerHeight;
     laidOutW = window.innerWidth;
-    let off = 0;
-    SEGMENTS.forEach(s => {
-      s.start = off * vh;
-      off += s.w;
-      s.end = off * vh;
-    });
-    totalW = off;
-    // Set track height to drive page scrolling
-    track.style.height = `${totalW * vh + vh}px`;
+
+    const scrollContainer = document.getElementById('scrollContainer') || document.querySelector('.scroll-container');
+
+    if (scrollContainer) {
+      // When page content drives scroll, track adds ZERO extra height
+      track.style.height = '0px';
+      track.style.display = 'none';
+
+      // Compute max scroll from actual DOM document
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+
+      // Distribute segments proportionally across the real scroll height
+      let totalWeights = 0;
+      SEGMENTS.forEach(s => { totalWeights += s.w; });
+
+      let currentPixel = 0;
+      SEGMENTS.forEach(s => {
+        s.start = currentPixel;
+        const segmentHeight = (s.w / totalWeights) * maxScroll;
+        currentPixel += segmentHeight;
+        s.end = currentPixel;
+      });
+    } else {
+      // Standalone mode: tightly bound track height
+      let off = 0;
+      SEGMENTS.forEach(s => {
+        s.start = off * vh;
+        off += s.w;
+        s.end = off * vh;
+      });
+      track.style.height = `${off * vh}px`;
+    }
+
     read();
   }
 
   function jumpTo(i) {
+    // Check if DOM station exists first
     const s = SECTIONS[i];
+    if (s && s.domSelector) {
+      const el = document.querySelector(s.domSelector);
+      if (el) {
+        el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        return;
+      }
+    }
+
     if (!s || !s._seg) return;
     const seg = s._seg;
     const targetY = seg.start + (seg.end - seg.start) * 0.45;
@@ -721,11 +840,10 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
    */
   function read() {
     const y = window.scrollY || window.pageYOffset || 0;
-    const fade = CROSSFADE * vh;
-    const totalHeight = totalW * vh;
-    const progress = clamp(y / (totalHeight || 1));
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const progress = clamp(y / maxScroll);
 
-    // Update backdrop progress
+    // Update 3D canvas backdrop progress
     if (backdrop) {
       backdrop.updateProgress(progress);
     }
@@ -735,11 +853,13 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
       if (y >= SEGMENTS[i].start) ci = i;
     }
 
+    const fade = CROSSFADE * vh;
+
     // Prefetch and scrub segments
     for (let i = 0; i < NSEG; i++) {
       const s = SEGMENTS[i];
       // Prefetch clips within scroll vicinity
-      if (y > s.start - 1.8 * vh && y < s.end + 1.8 * vh) {
+      if (y > s.start - 1.5 * vh && y < s.end + 1.5 * vh) {
         loadClip(s);
       }
 
@@ -758,26 +878,6 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
       if (!s.hasClip || !s.ready) {
         const sc = reduceMotion ? 1 : 1.02 + local * 0.12;
         s.img.style.transform = `scale(${sc.toFixed(3)})`;
-      }
-    }
-
-    // Section copy & station overlay animations
-    for (let i = 0; i < N; i++) {
-      const seg = SECTIONS[i]._seg;
-      const pr = clamp((y - seg.start) / ((seg.end - seg.start) || 1), 0, 1);
-      const before = y < seg.start;
-      const after = y > seg.end;
-
-      let cop;
-      if (i === 0) cop = after ? 0 : smooth(1 - pr / 0.65);
-      else if (i === N - 1) cop = before ? 0 : smooth(pr / 0.45);
-      else cop = (before || after) ? 0 : smooth(1 - Math.abs(pr - 0.5) / 0.5);
-
-      const c = copies[i];
-      if (c) {
-        c.style.opacity = cop;
-        c.style.transform = reduceMotion ? 'none' : `translateY(${(0.5 - pr) * 3.5}vh)`;
-        c.style.pointerEvents = cop > 0.5 ? 'auto' : 'none';
       }
     }
 
@@ -803,14 +903,27 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
       }
     }
 
+    // Update Minimap Drone Position and Active States
+    if (minimapDrone) {
+      minimapDrone.style.top = `${progress * 100}%`;
+    }
+
     // Waypoint activation change
     if (near !== activeIndex) {
       const prev = activeIndex;
       activeIndex = near;
 
-      dots.forEach((d, k) => d.classList && d.classList.toggle('is-active', k === near));
-      if (nav && typeof nav.querySelectorAll === 'function') {
-        nav.querySelectorAll('.sw-nav__item').forEach((n, k) => n.classList && n.classList.toggle('is-active', k === near));
+      // Update minimap node active classes
+      minimapNodeButtons.forEach((btn, k) => {
+        btn.classList.toggle('is-active', k === near);
+      });
+
+      // Update telemetry readouts
+      if (navTelemetry && SECTIONS[near]) {
+        navTelemetry.textContent = `0${near + 1} // ${SECTIONS[near].kanji || ''}`;
+      }
+      if (altTelemetry) {
+        altTelemetry.textContent = `${Math.round(120 + near * 45)}m`;
       }
 
       if (container && container.style && container.style.setProperty) {
@@ -851,35 +964,13 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
     }
 
     scrollbarFill.style.transform = `scaleX(${progress})`;
-    hint.style.opacity = clamp(1 - y / (0.45 * vh));
+    hint.style.opacity = clamp(1 - y / (0.35 * vh));
     if (particles) {
       particles.style.transform = `translate3d(0, ${-y * 0.04}px, 0)`;
     }
 
     ticking = false;
   }
-
-  const rAF = (cb) => {
-    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-      return window.requestAnimationFrame(cb);
-    }
-    if (typeof requestAnimationFrame === 'function') {
-      return requestAnimationFrame(cb);
-    }
-    return setTimeout(cb, 16);
-  };
-
-  const cancelRAF = (id) => {
-    if (typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
-      window.cancelAnimationFrame(id);
-    } else if (typeof cancelAnimationFrame === 'function') {
-      cancelAnimationFrame(id);
-    } else {
-      clearTimeout(id);
-    }
-  };
-
-  let rafId = null;
 
   /**
    * requestAnimationFrame Loop
@@ -950,7 +1041,8 @@ export function mountScrollWorld(containerElementOrSelector, config = {}) {
     getCurrentStation: () => ({ index: activeIndex, station: SECTIONS[activeIndex] }),
     getProgress: () => {
       const y = window.scrollY || 0;
-      return clamp(y / (totalW * vh || 1));
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      return clamp(y / maxScroll);
     },
     destroy: () => {
       isRunning = false;
@@ -1005,8 +1097,8 @@ export class ScrubEngine {
  * Procedural SVG Data URI for Poster Fallback
  */
 function createPosterDataUri(stationIndex, kind, accentColor) {
-  const titles = ['創生 The Genesis', '音韻 Sound Sanctuary', '工房 Project Forge', '海向 Umimukō Music', '終章 Terminal Finale'];
-  const kanji = ['創生', '音韻', '工房', '海向', '終章'];
+  const titles = ['創生 The Genesis', '工房 Project Forge', '海向 Umimukō Music', '音韻 Sound Sanctuary', '終章 Terminal Finale'];
+  const kanji = ['創生', '工房', '海向', '音韻', '終章'];
   const t = titles[stationIndex] || `Station ${stationIndex + 1}`;
   const k = kanji[stationIndex] || '雅';
   const color = accentColor || '#75c8e8';
@@ -1140,21 +1232,6 @@ function injectCSS() {
     background: linear-gradient(90deg, #164e78, #75c8e8);
     box-shadow: 0 0 10px #75c8e8;
   }
-  .sw-topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: clamp(14px, 2vw, 24px) clamp(20px, 4vw, 56px);
-    pointer-events: none;
-  }
-  .sw-nav {
-    display: none; /* Managed by persistent header-dock */
-  }
   .sw-stage {
     position: fixed;
     inset: 0;
@@ -1203,84 +1280,166 @@ function injectCSS() {
     inset: 0;
     z-index: 20;
     pointer-events: none;
-    display: none; /* Liquid glass UI overlay is provided by index.html */
+    display: none;
   }
-  .sw-route {
+
+  /* 3D Spatial Minimap & Flight Waypoint HUD */
+  .sw-minimap {
     position: fixed;
-    right: clamp(16px, 2.5vw, 36px);
+    right: clamp(14px, 2.5vw, 36px);
     top: 50%;
-    z-index: 80;
     transform: translateY(-50%);
+    z-index: 85;
+    background: rgba(8, 14, 23, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(117, 200, 232, 0.3);
+    border-radius: 18px;
+    padding: 16px 14px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75), 0 0 25px rgba(22, 78, 120, 0.25);
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 18px 10px;
+    gap: 12px;
+    width: 170px;
     pointer-events: auto;
+    user-select: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
-  .sw-route::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 20px;
-    bottom: 20px;
-    width: 1.5px;
-    transform: translateX(-50%);
-    background: linear-gradient(180deg, transparent, rgba(117, 200, 232, 0.4), transparent);
+  .sw-minimap:hover {
+    border-color: rgba(117, 200, 232, 0.5);
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.85), 0 0 35px rgba(117, 200, 232, 0.2);
   }
-  .sw-route__dot {
-    position: relative;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-    display: grid;
-    place-items: center;
-    padding: 0;
+  .sw-minimap__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(32, 54, 74, 0.7);
   }
-  .sw-route__dot i {
+  .sw-minimap__radar-pulse {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(130, 151, 170, 0.5);
-    border: 1px solid rgba(117, 200, 232, 0.3);
-    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
-  }
-  .sw-route__dot:hover i {
-    transform: scale(1.3);
     background: #75c8e8;
     box-shadow: 0 0 10px #75c8e8;
+    animation: radarPulse 1.6s ease-in-out infinite;
   }
-  .sw-route__dot.is-active i {
-    background: #75c8e8;
-    transform: scale(1.5);
-    box-shadow: 0 0 12px #75c8e8, 0 0 0 4px rgba(117, 200, 232, 0.2);
+  @keyframes radarPulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #75c8e8; }
+    100% { transform: scale(0.9); opacity: 0.6; }
   }
-  .sw-route__label {
-    position: absolute;
-    right: 28px;
-    top: 50%;
-    transform: translateY(-50%) translateX(8px);
+  .sw-minimap__title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #75c8e8;
     white-space: nowrap;
-    font-size: 0.76rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: #dce5ec;
-    background: rgba(8, 14, 23, 0.88);
-    backdrop-filter: blur(14px);
-    padding: 5px 12px;
-    border-radius: 20px;
-    opacity: 0;
+  }
+  .sw-minimap__track {
+    position: relative;
+    padding: 4px 0;
+  }
+  .sw-minimap__line {
+    position: absolute;
+    left: 17px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background: linear-gradient(180deg, #75c8e8, rgba(22, 78, 120, 0.4), #75c8e8);
+    opacity: 0.4;
+  }
+  .sw-minimap__drone {
+    position: absolute;
+    left: 14px;
+    top: 0%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #75c8e8;
+    box-shadow: 0 0 12px #75c8e8, 0 0 0 3px rgba(117, 200, 232, 0.3);
+    transform: translate(-50%, -50%);
+    transition: top 0.15s ease-out;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    border: 1px solid rgba(117, 200, 232, 0.25);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    z-index: 3;
   }
-  .sw-route__dot:hover .sw-route__label,
-  .sw-route__dot.is-active .sw-route__label {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
+  .sw-minimap__nodes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
   }
+  .sw-minimap__node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 0;
+    padding: 4px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .sw-minimap__node:hover {
+    background: rgba(117, 200, 232, 0.1);
+    transform: translateX(2px);
+  }
+  .sw-minimap__node.is-active {
+    background: rgba(22, 78, 120, 0.3);
+  }
+  .sw-minimap__node .node-badge {
+    font-size: 0.64rem;
+    font-weight: 800;
+    font-family: monospace;
+    color: #8297aa;
+    width: 18px;
+  }
+  .sw-minimap__node.is-active .node-badge {
+    color: #75c8e8;
+  }
+  .sw-minimap__node .node-kanji {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #dce5ec;
+    background: rgba(10, 32, 56, 0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(117, 200, 232, 0.2);
+  }
+  .sw-minimap__node.is-active .node-kanji {
+    color: #ffffff;
+    background: rgba(22, 78, 120, 0.7);
+    border-color: #75c8e8;
+    box-shadow: 0 0 8px rgba(117, 200, 232, 0.4);
+  }
+  .sw-minimap__node .node-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #8297aa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sw-minimap__node.is-active .node-name {
+    color: #ffffff;
+    font-weight: 700;
+  }
+  .sw-minimap__telemetry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid rgba(32, 54, 74, 0.7);
+    font-size: 0.64rem;
+    font-family: monospace;
+    color: #8297aa;
+  }
+  .sw-telemetry-item b {
+    color: #75c8e8;
+  }
+
   .sw-hint {
     position: fixed;
     left: 50%;
@@ -1331,12 +1490,20 @@ function injectCSS() {
   }
 
   @media (max-width: 860px) {
-    .sw-route {
+    .sw-minimap {
       right: 10px;
-      gap: 16px;
+      width: auto;
+      padding: 10px 8px;
+      gap: 8px;
+      border-radius: 14px;
     }
-    .sw-route__label {
+    .sw-minimap__header,
+    .sw-minimap__telemetry,
+    .sw-minimap__node .node-name {
       display: none;
+    }
+    .sw-minimap__node {
+      padding: 4px 2px;
     }
     .sw-hint {
       bottom: calc(18px + env(safe-area-inset-bottom));
@@ -1345,18 +1512,15 @@ function injectCSS() {
   }
 
   @media (hover: none) and (pointer: coarse) {
-    .sw-route {
-      padding: 12px 6px;
-    }
-    .sw-route__dot {
-      width: 28px;
-      height: 28px;
+    .sw-minimap__node {
+      min-height: 32px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .sw-hint i::after { animation: none; }
     .sw-pt { display: none; }
+    .sw-minimap__radar-pulse { animation: none; }
   }
   `;
 
@@ -1377,16 +1541,6 @@ function pad(n) {
 }
 function esc(s) {
   return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-}
-function ctaBtns(cta) {
-  let h = '';
-  if (cta.primary) {
-    h += `<a class="sw-btn sw-btn--primary" href="${esc(cta.primary.href || '#')}">${esc(cta.primary.label)}</a>`;
-  }
-  if (cta.secondary) {
-    h += `<a class="sw-btn sw-btn--ghost" href="${esc(cta.secondary.href || '#')}">${esc(cta.secondary.label)}</a>`;
-  }
-  return h;
 }
 
 // Expose globally for script tag users

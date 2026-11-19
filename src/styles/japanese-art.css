@@ -313,26 +313,59 @@
 }
 
 /* --------------------------------------------------------------------------
-   8. Coming Soon & Dot Indicator
+   8. Portfolio Hero Explore Indicator & Badges
    -------------------------------------------------------------------------- */
-.coming-soon-wrapper {
-  font-size: clamp(16px, 2.5vw, 20px);
-  font-weight: 600;
-  color: #b8c8d4;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  min-height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
+.hero-tagline {
+  font-size: clamp(14px, 2.2vw, 17px);
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  opacity: 0.92;
 }
 
-.dots-text {
+.hero-explore-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 14px;
+  padding: 8px 22px;
+  border-radius: 30px;
+  background: rgba(22, 78, 120, 0.28);
+  border: 1px solid rgba(117, 200, 232, 0.3);
+  box-shadow: 0 4px 18px rgba(10, 32, 56, 0.4);
+  transition: all 0.3s ease;
+  animation: heroPulse 3s ease-in-out infinite alternate;
+}
+
+.hero-explore-hint .explore-arrow {
   display: inline-block;
-  min-width: 32px;
-  text-align: left;
+  animation: bounceDown 1.8s ease-in-out infinite;
+}
+
+@keyframes heroPulse {
+  0% {
+    box-shadow: 0 4px 18px rgba(10, 32, 56, 0.4);
+    border-color: rgba(117, 200, 232, 0.25);
+  }
+  100% {
+    box-shadow: 0 6px 26px rgba(117, 200, 232, 0.35);
+    border-color: var(--cyan);
+  }
+}
+
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
 }
 
 /* --------------------------------------------------------------------------

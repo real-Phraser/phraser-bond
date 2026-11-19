@@ -5,15 +5,16 @@
  *
  * Responsibilities:
  * 1. Fetches public repositories for GitHub user `real-Phraser` (or TARGET_USER).
- * 2. For each repo:
+ * 2. Filters out 'phraser-bond' itself (portfolio host) so only external projects appear.
+ * 3. For each project repo (e.g. 'Umimuko-Music'):
  *    - Checks if `docs/index.html` exists.
  *    - If docs/ exists: recursively downloads docs files into dist/[repo-name]/,
  *      injecting `<base href="/[repo-name]/">` if needed.
- *    - If docs/ does not exist: generates a sleek, dark-navy Japanese-aesthetic
- *      project landing page matching the site theme at dist/[repo-name]/index.html.
+ *    - If docs/ does not exist: generates a sleek, fluid, dark-navy Japanese-aesthetic
+ *      documentation page at dist/[repo-name]/index.html with smooth CSS transitions.
  *    - Also copies/downloads screenshots if available in docs/ into dist/[repo-name]/.
- * 3. Outputs dist/data/projects.json (and public/data/projects.json) manifest.
- * 4. Supports offline / local fallback mode so builds never fail.
+ * 4. Outputs dist/data/projects.json (and public/data/projects.json) manifest.
+ * 5. Supports offline / local fallback mode so builds never fail.
  */
 
 import fs from 'node:fs';
@@ -36,14 +37,6 @@ const KNOWN_PROJECTS = {
     tagline: 'Cross-platform desktop music player built with Kotlin & Compose Multiplatform.',
     kanjiBadge: '海向こう • 音韻',
     accentColor: '#75c8e8',
-    spotifyUrl: 'https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8',
-  },
-  'phraser-bond': {
-    title: '創生 Phraser Bond',
-    tagline: 'Avant-garde Neo-Tokyo 3D camera-flight scroll portfolio and Japanese cyberpunk universe.',
-    kanjiBadge: '創生 • 3D空間',
-    accentColor: '#75c8e8',
-    spotifyUrl: 'https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8',
   },
 };
 
@@ -138,7 +131,7 @@ function copyDirSync(src, dest) {
 }
 
 /**
- * Fetch repositories for TARGET_USER
+ * Fetch repositories for TARGET_USER (excluding 'phraser-bond' itself)
  */
 async function getRepositories() {
   console.log(`[sync-repos] Fetching public repos for user: ${TARGET_USER}...`);
@@ -147,7 +140,8 @@ async function getRepositories() {
 
   if (Array.isArray(remoteRepos) && remoteRepos.length > 0) {
     console.log(`[sync-repos] Successfully fetched ${remoteRepos.length} repos from GitHub API.`);
-    return remoteRepos.filter((r) => !r.fork);
+    // Exclude forks and phraser-bond itself
+    return remoteRepos.filter((r) => !r.fork && r.name !== 'phraser-bond');
   }
 
   console.log(`[sync-repos] Remote API unavailable or empty. Activating offline / local mock discovery.`);
@@ -214,22 +208,6 @@ function getLocalOrMockRepositories() {
       topics: ['music', 'music-player', 'compose-multiplatform', 'vlc', 'desktop', 'kotlin'],
     });
   }
-
-  // Check phraser-bond
-  repos.push({
-    id: 1002,
-    name: 'phraser-bond',
-    full_name: `${TARGET_USER}/phraser-bond`,
-    description: 'Avant-garde Neo-Tokyo 3D camera-flight scroll portfolio and Japanese cyberpunk universe.',
-    stargazers_count: 1,
-    watchers_count: 1,
-    language: 'JavaScript',
-    html_url: `https://github.com/${TARGET_USER}/phraser-bond`,
-    homepage: 'https://phraser.bond',
-    updated_at: new Date().toISOString(),
-    topics: ['portfolio', 'scroll-world', '3d-camera', 'ukiyo-e', 'neo-tokyo', 'liquid-glass'],
-    _localPath: ROOT_DIR,
-  });
 
   return repos;
 }
@@ -340,7 +318,7 @@ async function processRepoDocs(repo) {
       fs.writeFileSync(indexPublicPath, html, 'utf8');
     }
   } else {
-    console.log(`[sync-repos] Repository ${repoName} does NOT have docs/index.html. Generating Japanese dark-navy landing page...`);
+    console.log(`[sync-repos] Repository ${repoName} does NOT have docs/index.html. Generating fluid Japanese dark-navy showcase...`);
     const generatedHtml = generateJapaneseProjectLandingHtml(repo, docsFiles);
     fs.writeFileSync(indexDistPath, generatedHtml, 'utf8');
     fs.writeFileSync(indexPublicPath, generatedHtml, 'utf8');
@@ -350,7 +328,8 @@ async function processRepoDocs(repo) {
 }
 
 /**
- * Generate a sleek, dark-navy Japanese-aesthetic project card landing page
+ * Generate a fluid, open dark-navy Japanese-aesthetic project documentation showcase page
+ * (Smooth transitions, no 3D mouse tilt, no Spotify pill on subpages)
  */
 function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
   const known = KNOWN_PROJECTS[repo.name] || {};
@@ -372,7 +351,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       <section class="gallery-section">
         <div class="gallery-header">
           <span class="gallery-kanji">写 真</span>
-          <span class="gallery-title">Application Showcase & Visuals</span>
+          <span class="gallery-title">Application Visuals & Screenshots</span>
         </div>
         <div class="gallery-grid">
           ${imageFiles
@@ -424,10 +403,10 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       align-items: center;
       position: relative;
       overflow-x: hidden;
-      padding: clamp(20px, 4vw, 60px) 16px;
+      padding: clamp(24px, 4vw, 64px) 16px;
     }
 
-    /* Scanlines and Papergrain Overlay */
+    /* Scanlines Overlay */
     .scanlines {
       position: fixed;
       inset: 0;
@@ -437,10 +416,10 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
         to bottom,
         transparent 0px,
         transparent 2px,
-        rgba(5, 8, 13, 0.45) 2px,
-        rgba(5, 8, 13, 0.45) 4px
+        rgba(5, 8, 13, 0.35) 2px,
+        rgba(5, 8, 13, 0.35) 4px
       );
-      opacity: 0.7;
+      opacity: 0.6;
     }
 
     /* Ambient Glowing Orbs */
@@ -453,19 +432,19 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       opacity: 0.22;
       animation: floatOrb 14s ease-in-out infinite alternate;
     }
-    .orb-1 { width: 500px; height: 500px; background: var(--blue); top: -150px; left: -100px; }
-    .orb-2 { width: 600px; height: 600px; background: var(--panel2); bottom: -180px; right: -120px; animation-delay: -6s; }
+    .orb-1 { width: 520px; height: 520px; background: var(--blue); top: -140px; left: -100px; }
+    .orb-2 { width: 620px; height: 620px; background: var(--panel2); bottom: -160px; right: -120px; animation-delay: -6s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(40px, 50px) scale(1.15); }
+      100% { transform: translate(35px, 45px) scale(1.12); }
     }
 
     /* Header Nav Dock */
     .top-dock {
-      width: min(840px, 94vw);
+      width: min(960px, 94vw);
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       margin-bottom: 28px;
       z-index: 5;
@@ -474,8 +453,8 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
     .back-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
+      gap: 10px;
+      padding: 10px 22px;
       border-radius: 30px;
       background: rgba(8, 14, 23, 0.85);
       border: 1px solid var(--line);
@@ -484,7 +463,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       font-size: 13px;
       font-weight: 500;
       backdrop-filter: blur(16px);
-      transition: all 0.25s ease;
+      transition: border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
     }
     .back-btn:hover {
       border-color: var(--cyan);
@@ -493,73 +472,29 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       transform: translateX(-3px);
     }
 
-    .spotify-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 18px;
-      border-radius: 30px;
-      background: rgba(8, 14, 23, 0.85);
-      border: 1px solid var(--line);
-      color: #1ed760;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      backdrop-filter: blur(16px);
-      transition: all 0.25s ease;
-    }
-    .spotify-pill:hover {
-      border-color: #1ed760;
-      box-shadow: 0 0 22px rgba(30, 215, 96, 0.3);
-      transform: translateY(-2px);
-    }
-    .equalizer-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      height: 12px;
-    }
-    .eq-bar {
-      width: 2px;
-      background: #1ed760;
-      border-radius: 1px;
-      animation: eqBounce 1s ease-in-out infinite alternate;
-    }
-    .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.1s; }
-    .eq-bar:nth-child(2) { height: 12px; animation-delay: 0.3s; }
-    .eq-bar:nth-child(3) { height: 8px; animation-delay: 0.2s; }
-    .eq-bar:nth-child(4) { height: 10px; animation-delay: 0.4s; }
-
-    @keyframes eqBounce {
-      0% { height: 3px; }
-      100% { height: 12px; }
-    }
-
-    /* Main Liquid Glass Container */
+    /* Fluid Open Documentation Container (No 3D Card tilt, natural smooth flow) */
     .container {
       position: relative;
       z-index: 4;
-      width: min(840px, 94vw);
+      width: min(960px, 94vw);
       background: linear-gradient(155deg, rgba(8, 14, 23, 0.94), rgba(5, 8, 13, 0.9));
       backdrop-filter: blur(28px);
       -webkit-backdrop-filter: blur(28px);
       border: 1px solid rgba(117, 200, 232, 0.22);
       border-radius: var(--radius);
-      box-shadow: 0 40px 110px rgba(0, 0, 0, 0.85),
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8),
                   inset 0 1px 0 rgba(184, 200, 212, 0.12),
                   inset 0 -1px 0 rgba(22, 78, 120, 0.25),
-                  0 0 60px rgba(10, 32, 56, 0.25);
-      padding: clamp(32px, 5vw, 56px);
+                  0 0 50px rgba(10, 32, 56, 0.2);
+      padding: clamp(32px, 5vw, 64px);
       overflow: hidden;
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease-out;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* Kanji Vertical Accent Watermark */
     .jp-vertical-accent {
       position: absolute;
-      right: 28px;
+      right: 32px;
       top: 50%;
       transform: translateY(-50%);
       writing-mode: vertical-rl;
@@ -585,7 +520,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       box-shadow: 0 0 25px rgba(117, 200, 232, 0.15);
     }
 
@@ -594,18 +529,18 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       display: flex;
       align-items: center;
       gap: 20px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .project-logo {
-      width: 58px;
-      height: 58px;
+      width: 60px;
+      height: 60px;
       border-radius: 16px;
       border: 1px solid var(--line);
       object-fit: cover;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
     .project-title {
-      font-size: clamp(28px, 4.5vw, 40px);
+      font-size: clamp(28px, 4.5vw, 42px);
       font-weight: 900;
       letter-spacing: -0.5px;
       background: linear-gradient(135deg, #ffffff 10%, #dce5ec 50%, #75c8e8 100%);
@@ -615,9 +550,9 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
 
     .project-desc {
       font-size: clamp(15px, 2vw, 17px);
-      line-height: 1.65;
+      line-height: 1.7;
       color: var(--text);
-      max-width: 680px;
+      max-width: 760px;
       margin-bottom: 24px;
     }
 
@@ -633,13 +568,17 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 14px;
+      padding: 7px 16px;
       border-radius: 12px;
       background: rgba(8, 14, 23, 0.65);
       border: 1px solid var(--line);
       font-size: 12px;
       color: var(--muted);
       font-weight: 500;
+      transition: border-color 0.2s ease;
+    }
+    .metric-chip:hover {
+      border-color: rgba(117, 200, 232, 0.35);
     }
     .metric-chip strong {
       color: var(--text);
@@ -659,7 +598,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       margin-bottom: 32px;
     }
     .topic-tag {
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 20px;
       background: rgba(22, 78, 120, 0.2);
       border: 1px solid rgba(117, 200, 232, 0.25);
@@ -667,6 +606,11 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.5px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .topic-tag:hover {
+      background: rgba(22, 78, 120, 0.4);
+      border-color: var(--cyan);
     }
 
     /* Action Buttons */
@@ -675,7 +619,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       flex-wrap: wrap;
       gap: 16px;
       align-items: center;
-      padding-top: 12px;
+      padding-top: 8px;
       margin-bottom: 36px;
     }
     .btn-primary {
@@ -692,7 +636,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       font-weight: 600;
       letter-spacing: 0.5px;
       box-shadow: 0 8px 30px rgba(117, 200, 232, 0.25);
-      transition: all 0.25s ease;
+      transition: box-shadow 0.25s ease, transform 0.25s ease;
     }
     .btn-primary:hover {
       box-shadow: 0 12px 35px rgba(117, 200, 232, 0.45);
@@ -711,7 +655,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.25s ease;
+      transition: border-color 0.25s ease, color 0.25s ease;
     }
     .btn-secondary:hover {
       border-color: var(--muted);
@@ -721,18 +665,18 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
     /* Gallery Section */
     .gallery-section {
       border-top: 1px solid var(--line);
-      padding-top: 32px;
-      margin-top: 12px;
+      padding-top: 36px;
+      margin-top: 16px;
     }
     .gallery-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .gallery-kanji {
       font-weight: 900;
-      font-size: 18px;
+      font-size: 20px;
       color: var(--cyan);
     }
     .gallery-title {
@@ -744,8 +688,8 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
     }
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
     }
     .gallery-item {
       background: rgba(5, 8, 13, 0.7);
@@ -754,22 +698,22 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: all 0.3s ease;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     }
     .gallery-item:hover {
       border-color: var(--cyan);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-      transform: translateY(-4px);
+      transform: translateY(-3px);
     }
     .gallery-item img {
       width: 100%;
-      height: 180px;
+      height: 190px;
       object-fit: cover;
       display: block;
       background: #000;
     }
     .gallery-label {
-      padding: 10px 14px;
+      padding: 12px 16px;
       font-size: 12px;
       color: var(--muted);
       font-weight: 500;
@@ -779,8 +723,8 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
     /* Hanko Signature Seal */
     .hanko-stamp {
       position: absolute;
-      bottom: 24px;
-      right: 28px;
+      bottom: 28px;
+      right: 32px;
       width: 44px;
       height: 44px;
       border: 2px solid rgba(117, 200, 232, 0.4);
@@ -799,7 +743,7 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
 
     /* Footer */
     footer {
-      margin-top: 36px;
+      margin-top: 40px;
       text-align: center;
       font-size: 12px;
       color: var(--muted);
@@ -820,21 +764,12 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
-      Phraser 3D Flight
-    </a>
-    <a href="https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8" target="_blank" rel="noopener noreferrer" class="spotify-pill" title="Listen to Phraser Selection">
-      <div class="equalizer-bars">
-        <div class="eq-bar"></div>
-        <div class="eq-bar"></div>
-        <div class="eq-bar"></div>
-        <div class="eq-bar"></div>
-      </div>
-      <span>雅 音楽 — Spotify</span>
+      ← Back to Portfolio
     </a>
   </header>
 
-  <!-- Liquid Glass Project Card -->
-  <main class="container" id="projectCard">
+  <!-- Fluid Documentation Showcase -->
+  <main class="container">
     <div class="jp-vertical-accent">海 向 こ う 創 造</div>
 
     <div class="kanji-badge">${kanjiBadge}</div>
@@ -893,26 +828,8 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
   </main>
 
   <footer>
-    <p>PHRASER BOND (海向こう) • NEO-TOKYO 3D SCROLL ARCHITECTURE</p>
+    <p>PHRASER • UMIMUKŌ (海向こう)</p>
   </footer>
-
-  <script>
-    // 3D Tilt perspective effect
-    const card = document.getElementById('projectCard');
-    if (card && window.matchMedia('(hover: hover)').matches) {
-      document.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const cardX = rect.left + rect.width / 2;
-        const cardY = rect.top + rect.height / 2;
-        const angleX = ((e.clientY - cardY) / 35).toFixed(2);
-        const angleY = (-(e.clientX - cardX) / 35).toFixed(2);
-        card.style.transform = \`perspective(1000px) rotateX(\${angleX}deg) rotateY(\${angleY}deg)\`;
-      });
-      document.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
-      });
-    }
-  </script>
 </body>
 </html>`;
 }
@@ -932,8 +849,18 @@ async function main() {
   ensureDirSync(path.join(DIST_DIR, 'data'));
   ensureDirSync(path.join(PUBLIC_DIR, 'data'));
 
+  // Clean up any stale phraser-bond subfolders in dist and public so only actual projects exist
+  const staleDistPhraserBond = path.join(DIST_DIR, 'phraser-bond');
+  const stalePublicPhraserBond = path.join(PUBLIC_DIR, 'phraser-bond');
+  if (fs.existsSync(staleDistPhraserBond)) {
+    fs.rmSync(staleDistPhraserBond, { recursive: true, force: true });
+  }
+  if (fs.existsSync(stalePublicPhraserBond)) {
+    fs.rmSync(stalePublicPhraserBond, { recursive: true, force: true });
+  }
+
   const rawRepos = await getRepositories();
-  console.log(`[sync-repos] Processing ${rawRepos.length} candidate repositories...`);
+  console.log(`[sync-repos] Processing ${rawRepos.length} candidate repositories (excluding portfolio host)...`);
 
   const manifest = [];
 

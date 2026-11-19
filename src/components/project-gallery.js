@@ -16,34 +16,26 @@ export const FALLBACK_PROJECTS = [
     route: '/Umimuko-Music/',
     githubUrl: 'https://github.com/real-Phraser/Umimuko-Music',
     updatedAt: '2026-11-18T04:31:58Z'
-  },
-  {
-    name: 'phraser-bond',
-    title: '創生 Phraser Bond',
-    description: 'Avant-garde Neo-Tokyo 3D camera-flight scroll portfolio and Japanese cyberpunk universe.',
-    stars: 0,
-    language: 'JavaScript',
-    topics: ['3d-scroll', 'camera-flight', 'neo-tokyo', 'portfolio'],
-    hasCustomDocs: false,
-    route: '/phraser-bond/',
-    githubUrl: 'https://github.com/real-Phraser/phraser-bond',
-    updatedAt: '2026-11-19T12:26:25Z'
   }
 ];
 
 /**
- * Fetches the projects list with fallback
+ * Fetches the projects list with fallback (excluding phraser-bond)
  * @returns {Promise<Array>}
  */
 export async function fetchProjects() {
   try {
+    let data;
     const res = await fetch('./data/projects.json');
     if (!res.ok) {
       const resRoot = await fetch('/data/projects.json');
       if (!resRoot.ok) throw new Error(`HTTP ${res.status}`);
-      return await resRoot.json();
+      data = await resRoot.json();
+    } else {
+      data = await res.json();
     }
-    return await res.json();
+    // Filter out phraser-bond itself
+    return Array.isArray(data) ? data.filter(p => p.name.toLowerCase() !== 'phraser-bond') : FALLBACK_PROJECTS;
   } catch (err) {
     console.warn('[Project Gallery] Using fallback projects manifest:', err);
     return FALLBACK_PROJECTS;
@@ -68,7 +60,7 @@ export function createProjectCard(project) {
   }
 
   // Determine child path documentation link
-  // Use relative link: './[project-name]/' to work seamlessly under /phraser-bond/ or domain root
+  // Relative link: './[project-name]/' works seamlessly on GitHub Pages subpaths and custom domains
   const docLink = `./${project.name}/`;
 
   card.innerHTML = `
@@ -119,7 +111,6 @@ export async function initProjectGallery(target = '#projectsGalleryMount') {
   wrapper.innerHTML = `
     <div class="jp-badge">工房計画 — Project Forge</div>
     <h2 class="section-title">創生・制作物 Projects Archive</h2>
-    <p class="section-desc">Dynamic project showcase synchronized automatically every 24 hours from @real-Phraser.</p>
     <div class="forge-grid" id="forgeGrid"></div>
   `;
 
@@ -134,25 +125,6 @@ export async function initProjectGallery(target = '#projectsGalleryMount') {
   });
 
   return wrapper;
-}
-
-// Auto-bootstrap when loaded in browser if container is present
-if (typeof window !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      const mount = document.getElementById('projectsGalleryMount');
-      if (mount && !mount.hasChildNodes()) {
-        initProjectGallery(mount);
-      }
-    });
-  } else {
-    setTimeout(() => {
-      const mount = document.getElementById('projectsGalleryMount');
-      if (mount && !mount.hasChildNodes()) {
-        initProjectGallery(mount);
-      }
-    }, 0);
-  }
 }
 
 export default initProjectGallery;

@@ -1,7 +1,8 @@
 /**
- * ⛩️ Umimukō Cyber-Cassette Player & Audio Shrine Pill
+ * ⛩️ Umimukō Cyber-Cassette Player (Station 4: 音韻 Sound Sanctuary)
  * Author: @stylist
- * Conforms strictly to plan.md Section 5 and coming-soon-genesis-rubik.html
+ * Conforms strictly to plan.md Section 5 and user feedback
+ * Lives exclusively inside Station 4 (#station-sound / #spotifyCardMount).
  */
 
 import { initJapaneseAtmosphere } from './japanese-atmosphere.js';
@@ -77,58 +78,26 @@ export function createSpotifyCard(options = {}) {
 }
 
 /**
- * Creates the persistent top-right Audio Shrine Pill
- * @returns {HTMLAnchorElement}
- */
-export function createAudioShrinePill(options = {}) {
-  const url = options.url || SPOTIFY_PLAYLIST_URL;
-  const pill = document.createElement('a');
-  pill.href = url;
-  pill.target = '_blank';
-  pill.rel = 'noopener noreferrer';
-  pill.className = 'audio-shrine-pill';
-  pill.id = 'audioShrinePill';
-  pill.setAttribute('aria-label', 'Open Spotify Audio Shrine');
-
-  pill.innerHTML = `
-    <div class="mini-eq" aria-hidden="true">
-      <span class="mini-bar"></span>
-      <span class="mini-bar"></span>
-      <span class="mini-bar"></span>
-    </div>
-    <span class="shrine-label">音韻 ⇱ SPOTIFY</span>
-  `;
-
-  return pill;
-}
-
-/**
- * Mounts the Cyber-Cassette Player into a target container
+ * Mounts the Cyber-Cassette Player into Station 4 (#spotifyCardMount)
  * @param {HTMLElement|string} target
  */
-export function initSpotifyWidget(target) {
+export function initSpotifyWidget(target = '#spotifyCardMount') {
   const container = typeof target === 'string' ? document.querySelector(target) : target;
   if (!container) return null;
+
+  // Clear existing to avoid duplicates
+  container.innerHTML = '';
   const card = createSpotifyCard();
   container.appendChild(card);
   return card;
 }
 
 /**
- * Mounts the persistent Audio Shrine Pill into the document body or header dock
- * @param {HTMLElement|string} [target]
+ * Audio Shrine Pill: deprecated per user feedback (Spotify removed from header).
+ * Kept as no-op for backward compatibility.
  */
-export function initAudioShrine(target = document.body) {
-  const container = typeof target === 'string' ? document.querySelector(target) : target;
-  if (!container) return null;
-
-  // Prevent duplicate mounts
-  const existing = document.getElementById('audioShrinePill');
-  if (existing) return existing;
-
-  const pill = createAudioShrinePill();
-  container.appendChild(pill);
-  return pill;
+export function initAudioShrine() {
+  return null;
 }
 
 // Auto-bootstrap Japanese atmosphere (drifting clouds, petals, collage) when module loads in browser

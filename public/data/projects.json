@@ -1,18 +1,5 @@
 [
   {
-    "name": "phraser-bond",
-    "title": "創生 Phraser Bond",
-    "description": "Avant-garde Neo-Tokyo 3D camera-flight scroll portfolio and Japanese cyberpunk universe.",
-    "stars": 0,
-    "language": "Code",
-    "topics": [],
-    "hasCustomDocs": false,
-    "route": "/phraser-bond/",
-    "githubUrl": "https://github.com/real-Phraser/phraser-bond",
-    "homepage": null,
-    "updatedAt": "2026-11-19T12:26:25Z"
-  },
-  {
     "name": "Umimuko-Music",
     "title": "海向こう Umimukō Music",
     "description": "🌊A clean, offline-first music player for Windows, Linux and MacOS — no streaming, no accounts, just your music.",

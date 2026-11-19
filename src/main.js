@@ -4,7 +4,7 @@ import './styles/japanese-art.css';
 import './styles/glass.css';
 
 import { initWorld } from './engine/world-setup.js';
-import { initSpotifyWidget, initAudioShrine } from './components/spotify-card.js';
+import { initSpotifyWidget } from './components/spotify-card.js';
 import { initProjectGallery } from './components/project-gallery.js';
 
 /**
@@ -13,8 +13,8 @@ import { initProjectGallery } from './components/project-gallery.js';
 function bootstrap() {
   console.log('⛩️ Bootstrapping Phraser Neo-Tokyo 3D Scroll Portfolio');
 
-  // 1. Initialize dots animation on hero card
-  initDotsAnimation();
+  // 1. Setup Header Waypoint Navigation & Active Sync
+  setupHeaderNav();
 
   // 2. Setup 3D mouse tilt & dynamic spotlight on liquid glass cards
   setupTiltEffect();
@@ -26,42 +26,80 @@ function bootstrap() {
     console.warn('[Spatial Engine] Initialization fallback:', err);
   }
 
-  // 4. Mount Spotify Cyber-Cassette Player into Station 2 (#spotifyCardMount)
-  try {
-    initSpotifyWidget('#spotifyCardMount');
-  } catch (err) {
-    console.warn('[Spotify Widget] Mount fallback:', err);
-  }
-
-  // 5. Mount Project Forge Gallery into Station 3 (#projectsGalleryMount)
+  // 4. Mount Project Forge Gallery into Station 2 (#projectsGalleryMount)
   try {
     initProjectGallery('#projectsGalleryMount');
   } catch (err) {
     console.warn('[Project Gallery] Mount fallback:', err);
   }
 
-  // 5. Mount persistent Audio Shrine Pill if needed
+  // 5. Mount Spotify Cyber-Cassette Player into Station 4 (#spotifyCardMount)
   try {
-    const dockRight = document.querySelector('.dock-right');
-    if (!document.getElementById('audioShrinePill') && !document.getElementById('spotifyDockPill')) {
-      initAudioShrine(dockRight || document.body);
-    }
+    initSpotifyWidget('#spotifyCardMount');
   } catch (err) {
-    console.warn('[Audio Shrine] Mount fallback:', err);
+    console.warn('[Spotify Widget] Mount fallback:', err);
   }
 }
 
 /**
- * Animated ellipsis for "coming soon" badge
+ * Setup Header Waypoint Navigation & Active State Tracking
  */
-function initDotsAnimation() {
-  const dotsEl = document.getElementById('dots');
-  if (!dotsEl) return;
-  let step = 0;
-  setInterval(() => {
-    step = (step + 1) % 4;
-    dotsEl.textContent = '.'.repeat(step);
-  }, 500);
+function setupHeaderNav() {
+  const navLinks = document.querySelectorAll('.header-nav .nav-link');
+  if (!navLinks.length) return;
+
+  // Smooth scroll click handler for header links
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('data-target') || link.getAttribute('href')?.replace('#', '');
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        navLinks.forEach((l) => l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  });
+
+  // Explore button smooth scroll
+  const exploreBtn = document.querySelector('.explore-btn');
+  if (exploreBtn) {
+    exploreBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const projectsSection = document.getElementById('station-projects');
+      if (projectsSection) {
+        projectsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+
+  // IntersectionObserver to sync active nav link during scroll/flight
+  const stations = document.querySelectorAll('section.station');
+  if (stations.length && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const stationId = entry.target.id;
+            navLinks.forEach((link) => {
+              const target = link.getAttribute('data-target') || link.getAttribute('href')?.replace('#', '');
+              if (target === stationId) {
+                link.classList.add('active');
+              } else {
+                link.classList.remove('active');
+              }
+            });
+          }
+        });
+      },
+      {
+        threshold: 0.35,
+      }
+    );
+
+    stations.forEach((st) => observer.observe(st));
+  }
 }
 
 /**

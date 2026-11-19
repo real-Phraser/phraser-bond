@@ -5,19 +5,19 @@
  * Configures the 5 spatial flight stations and 4 seamless connectors.
  * Connects the 3D scrub-engine to the #world container and DOM stations.
  *
- * STATIONS MANIFEST:
- * 1. 創生 The Genesis      (Hero Torii Gate & Shimmering ⇱ Emblem)
- * 2. 音韻 Sound Sanctuary  (Umimukō Spotify Cyber-Cassette Player)
- * 3. 工房 Project Forge    (Dynamic 3D Repository Gallery & 24h Cron)
- * 4. 海向 Umimukō Music    (Flagship Cross-Platform Desktop App)
- * 5. 終章 Terminal Finale  (Hanko Wax Seal, Bio, Social Altar)
+ * REORDERED FLIGHT MANIFEST (Projects above Music):
+ * 1. 創生 The Genesis      (#station-genesis  — Hero Torii Gate & Shimmering ⇱ Emblem)
+ * 2. 工房 Project Forge    (#station-projects — Dynamic 3D Repository Gallery & 24h Cron)
+ * 3. 海向 Umimukō Music    (#station-flagship — Flagship Desktop Audio Application)
+ * 4. 音韻 Sound Sanctuary  (#station-sound    — Umimukō Spotify Cyber-Cassette Player)
+ * 5. 終章 Terminal Finale  (#station-terminal — Hanko Wax Seal, Bio, Social Altar)
  * ============================================================================
  */
 
 import { mountScrollWorld, ScrubEngine } from './scrub-engine.js';
 
 /**
- * The 5 Flight Stations Specification
+ * The 5 Reordered Flight Stations Specification
  */
 export const STATIONS = [
   {
@@ -29,7 +29,7 @@ export const STATIONS = [
     title: '創生 The Genesis',
     body: 'Enter the spatial realm of Phraser. A synthesis of ancient Japanese minimalism, drifting Ukiyo-e vector clouds, and futuristic cyberpunk liquid glass.',
     accent: '#75c8e8',
-    scroll: 1.5,
+    scroll: 1.0,
     linger: 0.35,
     still: 'assets/posters/genesis.webp',
     stillMobile: 'assets/posters/genesis-m.webp',
@@ -39,15 +39,59 @@ export const STATIONS = [
     tags: ['Neo-Tokyo', 'Torii Gate', '⇱ Emblem', 'Liquid Glass'],
   },
   {
-    id: 'sanctuary',
+    id: 'forge',
     stationNumber: 2,
+    kanji: '工房',
+    label: '2: 工房 Project Forge',
+    eyebrow: '02 // 工房 — Project Forge',
+    title: '工房 Project Forge',
+    body: 'Dynamic 3D gallery of open-source engineering. Repositories automatically ingested every 24 hours directly from real-Phraser GitHub sanctum.',
+    accent: '#75c8e8',
+    scroll: 1.4,
+    linger: 0.5,
+    still: 'assets/posters/forge.webp',
+    stillMobile: 'assets/posters/forge-m.webp',
+    clip: 'assets/vid/forge.mp4',
+    clipMobile: 'assets/vid/forge-m.mp4',
+    domSelector: '#station-projects',
+    tags: ['GitHub Actions', '24h Cron Sync', 'Dynamic Docs', 'Open Source'],
+    cta: {
+      primary: { label: 'Explore Repositories', href: '#station-projects' },
+      secondary: { label: 'GitHub Sanctum', href: 'https://github.com/real-Phraser' },
+    },
+  },
+  {
+    id: 'umimuko',
+    stationNumber: 3,
+    kanji: '海向',
+    label: '3: 海向 Umimukō Music',
+    eyebrow: '03 // 旗艦 — Flagship Project',
+    title: '海向 Umimukō Music',
+    body: 'Cross-platform desktop music player crafted with Kotlin & Compose Multiplatform. High-performance native audio architecture with VLC engine.',
+    accent: '#75c8e8',
+    scroll: 1.2,
+    linger: 0.45,
+    still: 'assets/posters/umimuko.webp',
+    stillMobile: 'assets/posters/umimuko-m.webp',
+    clip: 'assets/vid/umimuko.mp4',
+    clipMobile: 'assets/vid/umimuko-m.mp4',
+    domSelector: '#station-flagship',
+    tags: ['Kotlin', 'Compose Multiplatform', 'VLC Engine', 'Desktop Audio'],
+    cta: {
+      primary: { label: 'Explore Documentation', href: './Umimuko-Music/' },
+      secondary: { label: 'Source Repository', href: 'https://github.com/real-Phraser/Umimuko-Music' },
+    },
+  },
+  {
+    id: 'sanctuary',
+    stationNumber: 4,
     kanji: '音韻',
-    label: '2: 音韻 Sound Sanctuary',
-    eyebrow: '02 // 雅 音楽 — Audio Altar',
+    label: '4: 音韻 Sound Sanctuary',
+    eyebrow: '04 // 雅 音楽 — Audio Altar',
     title: '音韻 Sound Sanctuary',
     body: 'The Umimukō Cyber-Cassette Player dock. Sonic frequencies curated by Phraser, streaming live from the Spotify sanctuary with glowing neon equalizer bars.',
     accent: '#164e78',
-    scroll: 1.4,
+    scroll: 1.2,
     linger: 0.45,
     still: 'assets/posters/sanctuary.webp',
     stillMobile: 'assets/posters/sanctuary-m.webp',
@@ -63,50 +107,6 @@ export const STATIONS = [
     },
   },
   {
-    id: 'forge',
-    stationNumber: 3,
-    kanji: '工房',
-    label: '3: 工房 Project Forge',
-    eyebrow: '03 // 自動化 — Repository Sanctum',
-    title: '工房 Project Forge',
-    body: 'Dynamic 3D gallery of open-source engineering. Repositories automatically ingested every 24 hours directly from real-Phraser GitHub sanctum.',
-    accent: '#75c8e8',
-    scroll: 2.0,
-    linger: 0.55,
-    still: 'assets/posters/forge.webp',
-    stillMobile: 'assets/posters/forge-m.webp',
-    clip: 'assets/vid/forge.mp4',
-    clipMobile: 'assets/vid/forge-m.mp4',
-    domSelector: '#station-projects',
-    tags: ['GitHub Actions', '24h Cron Sync', 'Dynamic Docs', 'Open Source'],
-    cta: {
-      primary: { label: 'Explore Repositories', href: '#station-projects' },
-      secondary: { label: 'GitHub Sanctum', href: 'https://github.com/real-Phraser' },
-    },
-  },
-  {
-    id: 'umimuko',
-    stationNumber: 4,
-    kanji: '海向',
-    label: '4: 海向 Umimukō Music',
-    eyebrow: '04 // 旗艦 — Flagship Project',
-    title: '海向 Umimukō Music',
-    body: 'Cross-platform desktop music player crafted with Kotlin & Compose Multiplatform. High-performance native audio architecture with VLC engine.',
-    accent: '#75c8e8',
-    scroll: 1.6,
-    linger: 0.45,
-    still: 'assets/posters/umimuko.webp',
-    stillMobile: 'assets/posters/umimuko-m.webp',
-    clip: 'assets/vid/umimuko.mp4',
-    clipMobile: 'assets/vid/umimuko-m.mp4',
-    domSelector: '#station-flagship',
-    tags: ['Kotlin', 'Compose Multiplatform', 'VLC Engine', 'Desktop Audio'],
-    cta: {
-      primary: { label: 'Explore Documentation', href: './Umimuko-Music/' },
-      secondary: { label: 'Source Repository', href: 'https://github.com/real-Phraser/Umimuko-Music' },
-    },
-  },
-  {
     id: 'terminal',
     stationNumber: 5,
     kanji: '終章',
@@ -115,7 +115,7 @@ export const STATIONS = [
     title: '終章 Terminal Finale',
     body: 'Creation across the digital sea. Hanko wax seal verified, source code open. Connect with Phraser across GitHub and cyberspace.',
     accent: '#dce5ec',
-    scroll: 1.2,
+    scroll: 1.0,
     linger: 0.35,
     still: 'assets/posters/terminal.webp',
     stillMobile: 'assets/posters/terminal-m.webp',
@@ -131,23 +131,23 @@ export const STATIONS = [
 ];
 
 /**
- * 4 Seamless Connectors (Joining consecutive stations)
+ * 4 Seamless Connectors (Joining consecutive stations in new order)
  */
 export const CONNECTORS = [
-  'assets/vid/conn0-genesis-to-sanctuary.mp4',
-  'assets/vid/conn1-sanctuary-to-forge.mp4',
-  'assets/vid/conn2-forge-to-umimuko.mp4',
-  'assets/vid/conn3-umimuko-to-terminal.mp4',
+  'assets/vid/conn0-genesis-to-forge.mp4',
+  'assets/vid/conn1-forge-to-umimuko.mp4',
+  'assets/vid/conn2-umimuko-to-sanctuary.mp4',
+  'assets/vid/conn3-sanctuary-to-terminal.mp4',
 ];
 
 /**
  * 4 Mobile Portrait Connectors (9:16 optimized for phones)
  */
 export const CONNECTORS_MOBILE = [
-  'assets/vid/conn0-genesis-to-sanctuary-m.mp4',
-  'assets/vid/conn1-sanctuary-to-forge-m.mp4',
-  'assets/vid/conn2-forge-to-umimuko-m.mp4',
-  'assets/vid/conn3-umimuko-to-terminal-m.mp4',
+  'assets/vid/conn0-genesis-to-forge-m.mp4',
+  'assets/vid/conn1-forge-to-umimuko-m.mp4',
+  'assets/vid/conn2-umimuko-to-sanctuary-m.mp4',
+  'assets/vid/conn3-sanctuary-to-terminal-m.mp4',
 ];
 
 /**
@@ -158,12 +158,12 @@ export const WORLD_CONFIG = {
     name: '海向こう Umimukō',
     href: '#station-genesis',
   },
-  diveScroll: 1.5,
-  connScroll: 0.9,
+  diveScroll: 1.0,
+  connScroll: 0.6,
   crossfade: 0.12,
   hint: 'スクロールして探索 // SCROLL TO FLY',
-  nav: false, // Navigation is handled cleanly by header-dock and right-side waypoint rail
-  showDefaultCopy: false, // HTML stations in index.html serve as the liquid glass UI
+  nav: false,
+  showDefaultCopy: false,
   atmosphere: true,
   sections: STATIONS,
   connectors: CONNECTORS,
@@ -236,7 +236,7 @@ export function initWorld(containerIdOrEl = 'world', options = {}) {
     domStations[0].classList.add('is-active');
   }
 
-  console.log('⛩️ 3D Scroll-World initialized across 5 stations with fallback canvas backdrop');
+  console.log('⛩️ 3D Scroll-World initialized across 5 stations with elevated cyber-shrine backdrop & flight radar minimap');
   return controller;
 }
 

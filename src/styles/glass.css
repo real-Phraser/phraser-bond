@@ -211,75 +211,150 @@
 }
 
 /* --------------------------------------------------------------------------
-   5. Sticky Header Dock with Glass Blur
+   5. Sticky Header Dock & Station Waypoint Navigation
    -------------------------------------------------------------------------- */
 .header-dock {
   position: fixed;
   top: 18px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(1180px, 92vw);
+  width: min(1180px, 94vw);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 24px;
-  background: rgba(8, 14, 23, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(117, 200, 232, 0.15);
+  padding: 8px 24px;
+  background: rgba(8, 14, 23, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(117, 200, 232, 0.22);
   border-radius: 40px;
   z-index: 100;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 24px rgba(10, 32, 56, 0.3);
+  transition: all 0.3s ease;
 }
 
-.header-brand {
+.dock-left {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text);
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 2px;
+  align-items: baseline;
+  gap: 8px;
+  user-select: none;
 }
 
-.header-brand .emblem-mini {
+.dock-kanji {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--text);
+  text-shadow: 0 0 12px rgba(117, 200, 232, 0.35);
+}
+
+.dock-sub {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
   color: var(--cyan);
-  font-size: 18px;
+  text-transform: uppercase;
 }
 
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 6px;
 }
 
 .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 20px;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  transition: color 0.2s ease;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.nav-link .nav-num {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--cyan);
+  opacity: 0.8;
+}
+
+.nav-link .nav-kanji {
+  font-size: 11px;
+  color: var(--text);
+  opacity: 0.9;
 }
 
 .nav-link:hover {
+  color: #ffffff;
+  background: rgba(22, 78, 120, 0.28);
+  border-color: rgba(117, 200, 232, 0.3);
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+.nav-link.active,
+.nav-link.is-active {
+  color: #ffffff;
+  background: rgba(22, 78, 120, 0.55);
+  border-color: var(--cyan);
+  box-shadow: 0 0 16px rgba(117, 200, 232, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-link.active .nav-num,
+.nav-link.is-active .nav-num {
+  opacity: 1;
   color: var(--cyan);
 }
 
 /* --------------------------------------------------------------------------
    6. Mobile & Viewport Adjustments
    -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-  .container,
-  .liquid-card {
-    padding: 32px 20px;
-    width: 92vw;
-  }
+@media (max-width: 900px) {
   .header-dock {
     top: 10px;
-    padding: 8px 16px;
+    padding: 6px 14px;
+    width: 96vw;
   }
   .header-nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+  }
+  .header-nav::-webkit-scrollbar {
     display: none;
+  }
+  .nav-link {
+    padding: 5px 10px;
+    font-size: 11px;
+    letter-spacing: 0.6px;
+  }
+  .dock-sub {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .container,
+  .liquid-card {
+    padding: 30px 18px;
+    width: 94vw;
+  }
+  .dock-kanji {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+  .nav-link {
+    padding: 4px 8px;
+    font-size: 10px;
   }
 }
 
@@ -497,76 +572,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   8. Top-Right Persistent Audio Shrine Pill
-   -------------------------------------------------------------------------- */
-.audio-shrine-pill {
-  position: fixed;
-  top: 20px;
-  right: 28px;
-  z-index: 101;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 18px;
-  border-radius: 30px;
-  background: rgba(8, 14, 23, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(117, 200, 232, 0.3);
-  color: var(--cyan);
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-decoration: none;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(22, 78, 120, 0.3);
-  transition: all 0.25s cubic-bezier(0.2, 0, 0.2, 1);
-  user-select: none;
-}
-
-.audio-shrine-pill:hover {
-  transform: translateY(-2px) scale(1.04);
-  border-color: var(--cyan);
-  color: #ffffff;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(117, 200, 232, 0.5);
-}
-
-.audio-shrine-pill .mini-eq {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 14px;
-}
-
-.audio-shrine-pill .mini-bar {
-  width: 3px;
-  background: var(--cyan);
-  border-radius: 2px;
-  animation: eqPulse 1s ease-in-out infinite alternate;
-}
-
-.audio-shrine-pill .mini-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
-.audio-shrine-pill .mini-bar:nth-child(2) { height: 100%; animation-delay: 0.3s; }
-.audio-shrine-pill .mini-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
-
-.audio-shrine-pill .shrine-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-@media (max-width: 580px) {
-  .audio-shrine-pill {
-    top: 14px;
-    right: 14px;
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-}
-
-
-/* --------------------------------------------------------------------------
-   9. Station Layout & Architecture Integration
+   8. Seamless Station Presentation & 3D Flight Experience
    -------------------------------------------------------------------------- */
 .scroll-container {
   width: 100%;
@@ -580,9 +586,79 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 100px 20px 80px;
+  padding: 100px 24px 60px;
   box-sizing: border-box;
   position: relative;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+  will-change: opacity, transform;
+}
+
+/* Seamless Waypoint Transition Effect */
+.station:not(.is-active) {
+  opacity: 0.42;
+  transform: scale(0.97) translateY(14px);
+  filter: blur(1.5px);
+}
+
+.station.is-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+}
+
+.station.is-active .glass-card,
+.station.is-active .container {
+  border-color: rgba(117, 200, 232, 0.45);
+  box-shadow:
+    0 40px 110px rgba(0, 0, 0, 0.85),
+    0 0 50px rgba(22, 78, 120, 0.35),
+    inset 0 1px 0 rgba(184, 200, 212, 0.2);
+}
+
+/* Explore Archive Button on Station 1 */
+.explore-wrapper {
+  margin: 16px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.explore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 26px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, rgba(22, 78, 120, 0.45), rgba(8, 14, 23, 0.85));
+  border: 1px solid rgba(117, 200, 232, 0.35);
+  color: var(--cyan);
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.explore-btn:hover {
+  background: linear-gradient(135deg, rgba(22, 78, 120, 0.8), rgba(117, 200, 232, 0.3));
+  border-color: var(--cyan);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(117, 200, 232, 0.35);
+}
+
+.explore-btn .explore-arrow {
+  display: inline-block;
+  font-size: 14px;
+  animation: bounceDown 1.8s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
 
 .section-title {
@@ -606,7 +682,7 @@
   margin: 0 auto 28px;
 }
 
-/* Sound Sanctuary Card Mount */
+/* Sound Sanctuary Card Mount (Station 4) */
 .sound-sanctuary-card {
   width: min(560px, 92vw);
   display: flex;
@@ -717,90 +793,6 @@
   color: #ffffff;
   box-shadow: 0 0 16px var(--cyan);
   transform: translateY(-2px);
-}
-
-/* Header Dock Specifics */
-.dock-left {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.dock-kanji {
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  color: var(--text);
-  text-shadow: 0 0 12px rgba(117, 200, 232, 0.35);
-}
-
-.dock-sub {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: var(--cyan);
-  text-transform: uppercase;
-}
-
-.dock-right {
-  display: flex;
-  align-items: center;
-}
-
-/* Header Dock Spotify Pill */
-.spotify-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 18px;
-  border-radius: 30px;
-  background: rgba(7, 18, 30, 0.9);
-  border: 1px solid rgba(117, 200, 232, 0.3);
-  color: var(--cyan);
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-decoration: none;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
-  transition: all 0.25s ease;
-  user-select: none;
-}
-
-.spotify-pill:hover {
-  background: rgba(22, 78, 120, 0.6);
-  border-color: var(--cyan);
-  color: #ffffff;
-  box-shadow: 0 6px 24px rgba(117, 200, 232, 0.4);
-  transform: translateY(-2px);
-}
-
-.spotify-pill-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 14px;
-}
-
-.spotify-pill-bars span {
-  width: 3px;
-  background: var(--cyan);
-  border-radius: 2px;
-  animation: eqPulse 1.1s ease-in-out infinite alternate;
-}
-
-.spotify-pill-bars span:nth-child(1) { height: 35%; animation-delay: 0.1s; }
-.spotify-pill-bars span:nth-child(2) { height: 95%; animation-delay: 0.3s; }
-.spotify-pill-bars span:nth-child(3) { height: 60%; animation-delay: 0.15s; }
-.spotify-pill-bars span:nth-child(4) { height: 80%; animation-delay: 0.4s; }
-
-.spotify-pill-text {
-  white-space: nowrap;
-}
-
-.spotify-pill-arrow {
-  font-size: 14px;
-  color: var(--cyan);
 }
 
 /* Projects Gallery Container */

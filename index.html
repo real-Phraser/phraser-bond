@@ -39,29 +39,32 @@
   <div class="sakura-container" id="sakuraContainer" aria-hidden="true"></div>
   <div class="grimes-collage" id="grimesCollage" aria-hidden="true"></div>
 
-  <!-- Persistent Header Dock with Japanese Kanji Accents and Spotify Shrine Pill -->
+  <!-- Persistent Header Dock with Japanese Kanji Accents and Station Navigation -->
   <header class="header-dock" id="headerDock">
     <div class="dock-left">
       <div class="dock-kanji">海向こう</div>
       <div class="dock-sub">創 造</div>
     </div>
-    <div class="dock-right">
-      <a href="https://open.spotify.com/user/314myr3uatmxbfq3y6vo5gljp3fu?si=0c4d1f5aba0941c8" 
-         target="_blank" 
-         rel="noopener noreferrer" 
-         class="spotify-pill" 
-         id="spotifyDockPill"
-         aria-label="Phraser Spotify Audio Shrine">
-        <span class="spotify-pill-bars" aria-hidden="true">
-          <span></span><span></span><span></span><span></span>
-        </span>
-        <span class="spotify-pill-text">雅 音楽 — Phraser Selection</span>
-        <span class="spotify-pill-arrow" aria-hidden="true">↗</span>
+    <nav class="header-nav" id="headerNav" aria-label="Flight Waypoint Navigation">
+      <a href="#station-genesis" class="nav-link active" data-target="station-genesis">
+        <span class="nav-num">01</span> <span class="nav-kanji">創生</span> Genesis
       </a>
-    </div>
+      <a href="#station-projects" class="nav-link" data-target="station-projects">
+        <span class="nav-num">02</span> <span class="nav-kanji">工房</span> Projects
+      </a>
+      <a href="#station-flagship" class="nav-link" data-target="station-flagship">
+        <span class="nav-num">03</span> <span class="nav-kanji">海向</span> Umimukō
+      </a>
+      <a href="#station-sound" class="nav-link" data-target="station-sound">
+        <span class="nav-num">04</span> <span class="nav-kanji">音韻</span> Music
+      </a>
+      <a href="#station-terminal" class="nav-link" data-target="station-terminal">
+        <span class="nav-num">05</span> <span class="nav-kanji">終章</span> Terminal
+      </a>
+    </nav>
   </header>
 
-  <!-- Liquid Glass UI Overlay Across Flight Stations -->
+  <!-- Liquid Glass UI Overlay Across Flight Stations (Projects reordered above Music) -->
   <main class="scroll-container" id="scrollContainer">
     <!-- Station 1: The Genesis Hero Card -->
     <section class="station station-1" id="station-genesis" data-station="1">
@@ -69,39 +72,35 @@
         <div class="jp-vertical-accent">海 向 こ う 創 造</div>
 
         <div class="card-header">
-          <div class="jp-badge">まもなく公開 — 雅</div>
+          <div class="jp-badge">創生 — GENESIS</div>
           <h1 class="jp-title">海向こう Umimukō</h1>
-          <div class="brand-sub">Next Evolution Experience</div>
+          <div class="brand-sub">Phraser // Creative Universe &amp; Spatial Systems</div>
         </div>
 
         <div class="logo-wrapper">
           <div class="logo-symbol" aria-hidden="true">⇱</div>
         </div>
 
-        <div class="coming-soon-wrapper">
-          <span>coming soon</span><span class="dots-text" id="dots"></span>
+        <div class="explore-wrapper">
+          <a href="#station-projects" class="explore-btn" aria-label="Explore Projects Archive">
+            <span class="explore-text">探索 • EXPLORE ARCHIVE</span>
+            <span class="explore-arrow">↓</span>
+          </a>
         </div>
 
         <div class="hanko-seal">海</div>
       </div>
     </section>
 
-    <!-- Station 2: Sound Sanctuary (Spotify Walkman Dock) -->
-    <section class="station station-2" id="station-sound" data-station="2">
-      <div class="glass-card sound-sanctuary-card" id="spotifyCardMount">
-        <!-- Rendered by Spotify widget component -->
-      </div>
-    </section>
-
-    <!-- Station 3: Project Forge (Dynamic 3D Repository Gallery) -->
-    <section class="station station-3" id="station-projects" data-station="3">
+    <!-- Station 2: Project Forge (Dynamic 3D Repository Gallery - Projects above Music) -->
+    <section class="station station-2" id="station-projects" data-station="2">
       <div class="projects-gallery-container" id="projectsGalleryMount">
         <!-- Populated dynamically from projects manifest -->
       </div>
     </section>
 
-    <!-- Station 4: Flagship Umimukō Music Spotlight -->
-    <section class="station station-4" id="station-flagship" data-station="4">
+    <!-- Station 3: Flagship Umimukō Music Spotlight -->
+    <section class="station station-3" id="station-flagship" data-station="3">
       <div class="glass-card flagship-card" id="flagshipCardMount">
         <div class="jp-badge">旗艦計画 — Flagship</div>
         <h2 class="section-title">海向こう Umimukō Music</h2>
@@ -110,6 +109,13 @@
           <a href="./Umimuko-Music/" class="btn-primary">Documentation ↗</a>
           <a href="https://github.com/real-Phraser/Umimuko-Music" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub ↗</a>
         </div>
+      </div>
+    </section>
+
+    <!-- Station 4: Sound Sanctuary (Spotify Walkman Dock) -->
+    <section class="station station-4" id="station-sound" data-station="4">
+      <div class="glass-card sound-sanctuary-card" id="spotifyCardMount">
+        <!-- Rendered by Spotify widget component -->
       </div>
     </section>
 

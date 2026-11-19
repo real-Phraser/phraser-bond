@@ -215,3 +215,23 @@ a:hover {
     animation: none !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Mobile Performance Profile (Theme & Fullscreen Overlays)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px), (pointer: coarse) {
+  /* Eliminate heavy mix-blend-mode composite passes on full-screen fixed layers */
+  body::before {
+    mix-blend-mode: normal !important;
+    opacity: 0.05 !important;
+  }
+  body::after {
+    mix-blend-mode: normal !important;
+    opacity: 0.06 !important;
+  }
+
+  /* Disable expensive 100px-blur animated orbs on mobile to eliminate GPU texture strain */
+  .orb {
+    display: none !important;
+  }
+}

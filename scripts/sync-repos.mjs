@@ -750,6 +750,19 @@ function generateJapaneseProjectLandingHtml(repo, docsFiles = []) {
       z-index: 4;
       letter-spacing: 1px;
     }
+
+    /* Mobile Performance Profile */
+    @media (max-width: 768px), (pointer: coarse) {
+      .orb { display: none !important; }
+      .scanlines { opacity: 0.25 !important; }
+      .container {
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        background: rgba(8, 14, 23, 0.96) !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65) !important;
+        padding: 24px 16px !important;
+      }
+    }
   </style>
 </head>
 <body>

@@ -800,3 +800,40 @@
   width: min(1040px, 94vw);
   margin: 0 auto;
 }
+
+/* --------------------------------------------------------------------------
+   Mobile Performance Profile (Ultra-light, 60fps on phones, preserves PC fidelity)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px), (pointer: coarse) {
+  /* Fast GPU-friendly opaque slate glass replacing heavy 28px blur */
+  .container,
+  .liquid-card,
+  .glass-panel,
+  .glass-card,
+  .spotify-card,
+  .project-glass-card,
+  .flagship-card,
+  .terminal-card {
+    background: rgba(8, 14, 23, 0.96) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65) !important;
+    transform: none !important;
+  }
+
+  /* Disable dynamic radial cursor spotlight on touch */
+  .container::after,
+  .liquid-card::after {
+    display: none !important;
+  }
+
+  /* Hide complex minimap radar HUD on mobile */
+  .sw-minimap {
+    display: none !important;
+  }
+
+  .header-dock {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+}

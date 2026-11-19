@@ -379,3 +379,34 @@
     animation: none !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   10. Mobile Performance Profile (Clouds, Petals & Vector Collage)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px), (pointer: coarse) {
+  /* Eliminate heavy double drop-shadow filters on drifting SVG vector clouds */
+  .svg-cloud {
+    filter: none !important;
+    stroke-width: 1.4 !important;
+    opacity: 0.25 !important;
+  }
+
+  /* Only keep 4 slow ambient clouds on mobile */
+  .bg-art .svg-cloud:nth-child(n+5) {
+    display: none !important;
+  }
+
+  /* Eliminate saturate filter and limit petals to 6 on mobile */
+  .petal {
+    filter: none !important;
+    opacity: 0.3 !important;
+  }
+  .sakura-container .petal:nth-child(n+7) {
+    display: none !important;
+  }
+
+  /* Lighten opacity of complex background gothic line art */
+  .grimes-collage {
+    opacity: 0.25 !important;
+  }
+}

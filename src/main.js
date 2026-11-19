@@ -106,6 +106,11 @@ function setupHeaderNav() {
  * 3D Tilt and Dynamic Cursor Spotlight for Liquid Glass Containers
  */
 function setupTiltEffect() {
+  // Mobile Performance: completely bypass on touch / coarse pointer devices to keep phones light
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    return;
+  }
+
   const cards = document.querySelectorAll('.glass-card, .container, .liquid-card');
   if (!cards.length) return;
 

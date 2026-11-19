@@ -108,6 +108,7 @@ export class CyberShrineBackdrop {
   constructor(hostElement, options = {}) {
     this.host = hostElement;
     this.reduceMotion = options.reduceMotion || false;
+    this.isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'sw-canvas-backdrop';
     this.ctx = this.canvas.getContext('2d', { alpha: true });
@@ -115,7 +116,7 @@ export class CyberShrineBackdrop {
 
     this.width = 0;
     this.height = 0;
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.dpr = this.isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
 
     // Camera and flight state
     this.camZ = 0;
@@ -123,22 +124,23 @@ export class CyberShrineBackdrop {
     this.lastCamZ = 0;
     this.scrollVelocity = 0;
     this.scrollProgress = 0;
+    this.idleFrames = 0;
 
-    // Mouse parallax tracking
+    // Mouse parallax tracking (desktop only)
     this.mouseX = 0;
     this.mouseY = 0;
     this.targetMouseX = 0;
     this.targetMouseY = 0;
 
-    // Torii gates configuration in 3D world space
-    this.numGates = 8;
-    this.gateSpacing = 360;
+    // Torii gates configuration in 3D world space (lightweight on mobile)
+    this.numGates = this.isMobile ? 4 : 8;
+    this.gateSpacing = this.isMobile ? 420 : 360;
     this.totalGateSpan = this.numGates * this.gateSpacing;
 
-    // Floating Japanese kanji & data particles
+    // Floating Japanese kanji & data particles (reduced on mobile)
     this.kanjiGlyphs = ['海', '向', '創', '生', '工', '房', '音', '韻', '終', '章', '⇱', '雅', '波', '光'];
     this.particles = [];
-    this.initParticles(45);
+    this.initParticles(this.isMobile ? 10 : 45);
 
     this.resize = this.resize.bind(this);
     this.render = this.render.bind(this);
@@ -146,10 +148,13 @@ export class CyberShrineBackdrop {
 
     this.resize();
     window.addEventListener('resize', this.resize, { passive: true });
-    window.addEventListener('mousemove', this.onMouseMove, { passive: true });
+    if (!this.isMobile) {
+      window.addEventListener('mousemove', this.onMouseMove, { passive: true });
+    }
   }
 
   onMouseMove(e) {
+    if (this.isMobile) return;
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
     this.targetMouseX = (e.clientX - cx) / cx;
@@ -175,28 +180,41 @@ export class CyberShrineBackdrop {
   }
 
   resize() {
+    this.isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
     this.width = this.host.clientWidth || window.innerWidth;
     this.height = this.host.clientHeight || window.innerHeight;
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.dpr = this.isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
 
     this.canvas.width = Math.floor(this.width * this.dpr);
     this.canvas.height = Math.floor(this.height * this.dpr);
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
 
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(this.dpr, this.dpr);
   }
 
   updateProgress(progress) {
     this.scrollProgress = progress;
-    // Map total scroll progress smoothly to forward camera flight in Z
     this.targetZ = progress * this.totalGateSpan * 2.2;
+    this.idleFrames = 0; // Wake up immediately on scroll progress
   }
 
   render() {
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
+
+    // Mobile Power Saver: pause heavy redrawing when stationary
+    if (this.isMobile) {
+      const isMoving = Math.abs(this.targetZ - this.camZ) > 0.1 || this.scrollVelocity > 0.04;
+      if (!isMoving) {
+        this.idleFrames = (this.idleFrames || 0) + 1;
+        if (this.idleFrames > 3) return; // Rest when idle on phone
+      } else {
+        this.idleFrames = 0;
+      }
+    }
 
     ctx.clearRect(0, 0, w, h);
 
@@ -252,8 +270,8 @@ export class CyberShrineBackdrop {
     ctx.save();
     ctx.lineWidth = 1;
 
-    // A. Perspective floor lines (converging to vanishing point)
-    const numFloorLines = 18;
+    // A. Perspective floor lines (fewer on mobile)
+    const numFloorLines = this.isMobile ? 8 : 18;
     for (let i = 0; i <= numFloorLines; i++) {
       const xOffset = ((i - numFloorLines / 2) / (numFloorLines / 2)) * (w * 1.1);
       const bottomX = vpX + xOffset * 2.0;
@@ -270,27 +288,29 @@ export class CyberShrineBackdrop {
       ctx.stroke();
     }
 
-    // B. Subtle ceiling grid lines (cyber tunnel ceiling)
-    const numCeilLines = 12;
-    for (let i = 0; i <= numCeilLines; i++) {
-      const xOffset = ((i - numCeilLines / 2) / (numCeilLines / 2)) * (w * 1.0);
-      const topX = vpX + xOffset * 1.6;
+    // B. Subtle ceiling grid lines (desktop only for performance)
+    if (!this.isMobile) {
+      const numCeilLines = 12;
+      for (let i = 0; i <= numCeilLines; i++) {
+        const xOffset = ((i - numCeilLines / 2) / (numCeilLines / 2)) * (w * 1.0);
+        const topX = vpX + xOffset * 1.6;
 
-      const grad = ctx.createLinearGradient(vpX, vpY, topX, 0);
-      grad.addColorStop(0, 'rgba(117, 200, 232, 0)');
-      grad.addColorStop(0.4, 'rgba(22, 78, 120, 0.15)');
-      grad.addColorStop(1, 'rgba(117, 200, 232, 0.2)');
+        const grad = ctx.createLinearGradient(vpX, vpY, topX, 0);
+        grad.addColorStop(0, 'rgba(117, 200, 232, 0)');
+        grad.addColorStop(0.4, 'rgba(22, 78, 120, 0.15)');
+        grad.addColorStop(1, 'rgba(117, 200, 232, 0.2)');
 
-      ctx.strokeStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(vpX, vpY - 4);
-      ctx.lineTo(topX, 0);
-      ctx.stroke();
+        ctx.strokeStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(vpX, vpY - 4);
+        ctx.lineTo(topX, 0);
+        ctx.stroke();
+      }
     }
 
     // C. Moving horizontal cross-grid rungs (Z forward flight motion)
-    const rungCount = 12;
-    const rungSpacing = 140;
+    const rungCount = this.isMobile ? 6 : 12;
+    const rungSpacing = this.isMobile ? 220 : 140;
     const zOffset = (this.camZ % rungSpacing);
 
     for (let i = 1; i <= rungCount; i++) {
@@ -339,8 +359,10 @@ export class CyberShrineBackdrop {
 
       ctx.lineWidth = Math.max(1.5, 3.5 * scale);
       ctx.strokeStyle = `rgba(117, 200, 232, ${alpha.toFixed(3)})`;
-      ctx.shadowColor = 'rgba(117, 200, 232, 0.55)';
-      ctx.shadowBlur = 12 * scale;
+      if (!this.isMobile) {
+        ctx.shadowColor = 'rgba(117, 200, 232, 0.55)';
+        ctx.shadowBlur = 12 * scale;
+      }
 
       ctx.beginPath();
       ctx.moveTo(gateX - kasagiOverhang, kasagiY - curveLift);
@@ -451,8 +473,10 @@ export class CyberShrineBackdrop {
         ctx.font = `${Math.floor(p.size * scale)}px 'Rubik', sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(117, 200, 232, 0.6)';
-        ctx.shadowBlur = 8 * scale;
+        if (!this.isMobile) {
+          ctx.shadowColor = 'rgba(117, 200, 232, 0.6)';
+          ctx.shadowBlur = 8 * scale;
+        }
         ctx.fillText(p.glyph, 0, 0);
         ctx.restore();
       }
